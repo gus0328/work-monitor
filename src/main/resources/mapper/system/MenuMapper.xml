@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iccm.system.mapper.MenuMapper">
+
+    <resultMap type="Menu" id="MenuResult">
+        <result property="menuId"    column="menu_id"    />
+        <result property="menuTitle"    column="menu_title"    />
+        <result property="menuName"    column="menu_name"    />
+        <result property="menuUrl"    column="menu_url"    />
+        <result property="menuType"    column="menu_type"    />
+        <result property="orderNum"    column="order_num"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <resultMap type="SelectModel" id="selectModelResult">
+        <result     property="expand"     column="expand"     />
+        <result property="value"   column="menu_id"   />
+        <result property="title"   column="menu_title"   />
+        <result property="depart" column="parent_id"/>
+    </resultMap>
+
+    <select id="queryMenuSelect" parameterType="Object" resultMap="selectModelResult">
+        SELECT m.menu_id,m.menu_title,'true' as expand,parent_id from menu m
+        order by m.parent_id, m.order_num
+    </select>
+
+    <sql id="selectMenuVo">
+        select menu_id, menu_title, menu_name, menu_url, menu_type, order_num, parent_id, create_by, create_time, update_by, update_time, remark from menu
+    </sql>
+
+    <select id="selectMenuList" parameterType="Menu" resultMap="MenuResult">
+        <include refid="selectMenuVo"/>
+        <where>
+            <if test="menuTitle != null  and menuTitle != ''"> and menu_title like concat('%', #{menuTitle}, '%')</if>
+            <if test="menuName != null  and menuName != ''"> and menu_name = #{menuName}</if>
+            <if test="menuUrl != null  and menuUrl != ''"> and menu_url = #{menuUrl}</if>
+            <if test="menuType != null  and menuType != ''"> and menu_type = #{menuType}</if>
+            <if test="orderNum != null "> and order_num = #{orderNum}</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
+        </where>
+    </select>
+
+    <select id="selectMenuById" parameterType="Long" resultMap="MenuResult">
+        <include refid="selectMenuVo"/>
+        where menu_id = #{menuId}
+    </select>
+
+    <insert id="insertMenu" parameterType="Menu" useGeneratedKeys="true" keyProperty="menuId">
+        insert into menu
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="menuTitle != null  and menuTitle != ''">menu_title,</if>
+            <if test="menuName != null  and menuName != ''">menu_name,</if>
+            <if test="menuUrl != null  and menuUrl != ''">menu_url,</if>
+            <if test="menuType != null  and menuType != ''">menu_type,</if>
+            <if test="orderNum != null ">order_num,</if>
+            <if test="parentId != null ">parent_id,</if>
+            <if test="createBy != null  and createBy != ''">create_by,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="updateBy != null  and updateBy != ''">update_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="remark != null  and remark != ''">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="menuTitle != null  and menuTitle != ''">#{menuTitle},</if>
+            <if test="menuName != null  and menuName != ''">#{menuName},</if>
+            <if test="menuUrl != null  and menuUrl != ''">#{menuUrl},</if>
+            <if test="menuType != null  and menuType != ''">#{menuType},</if>
+            <if test="orderNum != null ">#{orderNum},</if>
+            <if test="parentId != null ">#{parentId},</if>
+            <if test="createBy != null  and createBy != ''">#{createBy},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="updateBy != null  and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="remark != null  and remark != ''">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMenu" parameterType="Menu">
+        update menu
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="menuTitle != null  and menuTitle != ''">menu_title = #{menuTitle},</if>
+            <if test="menuName != null  and menuName != ''">menu_name = #{menuName},</if>
+            <if test="menuUrl != null  and menuUrl != ''">menu_url = #{menuUrl},</if>
+            <if test="menuType != null  and menuType != ''">menu_type = #{menuType},</if>
+            <if test="orderNum != null ">order_num = #{orderNum},</if>
+            <if test="parentId != null ">parent_id = #{parentId},</if>
+            <if test="createBy != null  and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="updateBy != null  and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="remark != null  and remark != ''">remark = #{remark},</if>
+        </trim>
+        where menu_id = #{menuId}
+    </update>
+
+    <delete id="deleteMenuById" parameterType="Long">
+        delete from menu where menu_id = #{menuId}
+    </delete>
+
+    <delete id="deleteMenuByIds" parameterType="String">
+        delete from menu where menu_id in
+        <foreach item="menuId" collection="array" open="(" separator="," close=")">
+            #{menuId}
+        </foreach>
+    </delete>
+
+</mapper>

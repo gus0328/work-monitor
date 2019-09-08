@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iccm.system.mapper.SysAuthoritiesMapper">
+    
+    <resultMap type="SysAuthorities" id="SysAuthoritiesResult">
+        <result property="authority"    column="authority"    />
+        <result property="authorityName"    column="authority_name"    />
+        <result property="parentName"    column="parent_name"    />
+        <result property="orderNum"    column="order_num"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="parentUrl"    column="parent_url"    />
+    </resultMap>
+
+    <sql id="selectSysAuthoritiesVo">
+        select authority, authority_name, parent_name, order_num, create_time, parent_url from sys_authorities
+    </sql>
+
+    <delete id="deleteAll" >
+        DELETE from sys_authorities
+    </delete>
+
+    <select id="selectSysAuthoritiesList" parameterType="SysAuthorities" resultMap="SysAuthoritiesResult">
+        <include refid="selectSysAuthoritiesVo"/>
+        <where>  
+            <if test="authorityName != null  and authorityName != ''"> and authority_name like concat('%', #{authorityName}, '%')</if>
+            <if test="parentName != null  and parentName != ''"> and parent_name like concat('%', #{parentName}, '%')</if>
+            <if test="orderNum != null "> and order_num = #{orderNum}</if>
+            <if test="parentUrl != null  and parentUrl != ''"> and parent_url = #{parentUrl}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysAuthoritiesById" parameterType="String" resultMap="SysAuthoritiesResult">
+        <include refid="selectSysAuthoritiesVo"/>
+        where authority = #{authority}
+    </select>
+        
+    <insert id="insertSysAuthorities" parameterType="SysAuthorities">
+        insert into sys_authorities
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="authority != null  and authority != ''">authority,</if>
+            <if test="authorityName != null  and authorityName != ''">authority_name,</if>
+            <if test="parentName != null  and parentName != ''">parent_name,</if>
+            <if test="orderNum != null ">order_num,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="parentUrl != null  and parentUrl != ''">parent_url,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="authority != null  and authority != ''">#{authority},</if>
+            <if test="authorityName != null  and authorityName != ''">#{authorityName},</if>
+            <if test="parentName != null  and parentName != ''">#{parentName},</if>
+            <if test="orderNum != null ">#{orderNum},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="parentUrl != null  and parentUrl != ''">#{parentUrl},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysAuthorities" parameterType="SysAuthorities">
+        update sys_authorities
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="authorityName != null  and authorityName != ''">authority_name = #{authorityName},</if>
+            <if test="parentName != null  and parentName != ''">parent_name = #{parentName},</if>
+            <if test="orderNum != null ">order_num = #{orderNum},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="parentUrl != null  and parentUrl != ''">parent_url = #{parentUrl},</if>
+        </trim>
+        where authority = #{authority}
+    </update>
+
+    <delete id="deleteSysAuthoritiesById" parameterType="String">
+        delete from sys_authorities where authority = #{authority}
+    </delete>
+
+    <delete id="deleteSysAuthoritiesByIds" parameterType="String">
+        delete from sys_authorities where authority in 
+        <foreach item="authority" collection="array" open="(" separator="," close=")">
+            #{authority}
+        </foreach>
+    </delete>
+    
+</mapper>
