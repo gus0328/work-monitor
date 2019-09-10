@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd">
+
+	<diskStore path="user.home/web_ehcache/" />
+	<defaultCache maxElementsInMemory="300000" eternal="true"
+		overflowToDisk="false" diskSpoolBufferSizeMB="200000"
+		maxElementsOnDisk="0" diskPersistent="false"
+		diskExpiryThreadIntervalSeconds="100" memoryStoreEvictionPolicy="LFU" />
+	<cache name="sessions" maxElementsInMemory="3000000"
+		maxElementsOnDisk="0" eternal="true" overflowToDisk="false"
+		diskSpoolBufferSizeMB="200000" memoryStoreEvictionPolicy="LFU" />
+</ehcache>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iccm.system.mapper.RoleAuthorityMapper">
+    
+    <resultMap type="RoleAuthority" id="RoleAuthorityResult">
+        <result property="roleId"    column="role_id"    />
+        <result property="authority"    column="authority"    />
+    </resultMap>
+
+    <sql id="selectRoleAuthorityVo">
+        select role_id, authority from role_authority
+    </sql>
+
+    <select id="selectRoleAuthorityList" parameterType="RoleAuthority" resultMap="RoleAuthorityResult">
+        <include refid="selectRoleAuthorityVo"/>
+        <where>  
+        </where>
+    </select>
+    
+    <select id="selectRoleAuthorityById" parameterType="Long" resultMap="RoleAuthorityResult">
+        <include refid="selectRoleAuthorityVo"/>
+        where role_id = #{roleId}
+    </select>
+        
+    <insert id="insertRoleAuthority" parameterType="RoleAuthority">
+        insert into role_authority
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="roleId != null ">role_id,</if>
+            <if test="authority != null  and authority != ''">authority,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="roleId != null ">#{roleId},</if>
+            <if test="authority != null  and authority != ''">#{authority},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRoleAuthority" parameterType="RoleAuthority">
+        update role_authority
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="authority != null  and authority != ''">authority = #{authority},</if>
+        </trim>
+        where role_id = #{roleId}
+    </update>
+
+    <delete id="deleteRoleAuthorityById" parameterType="Long">
+        delete from role_authority where role_id = #{roleId}
+    </delete>
+
+    <delete id="deleteRoleAuthorityByIds" parameterType="String">
+        delete from role_authority where role_id in 
+        <foreach item="roleId" collection="array" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteRoleAuthByRoleIdAndAuth" parameterType="Object">
+        delete from role_authority where role_id = #{roleId} and authority = #{authority}
+    </delete>
+    
+</mapper>

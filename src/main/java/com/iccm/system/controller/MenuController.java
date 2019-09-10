@@ -3,6 +3,7 @@ package com.iccm.system.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.iccm.common.BaseController;
 import com.iccm.common.JsonResult;
+import com.iccm.common.SysUtils;
 import com.iccm.common.annotation.PermissionsApi;
 import com.iccm.common.annotation.RequiresPermissions;
 import com.iccm.system.model.Menu;
@@ -31,9 +32,10 @@ public class MenuController extends BaseController
      */
     @RequiresPermissions(value = "查询菜单列表",authorities = "post:system:menu:list")
     @PostMapping("/list")
-    public JSONArray list(@RequestBody Menu menu)
+    public JsonResult list(@RequestBody Menu menu)
     {
-        return menuService.selectMenuList(menu);
+        JSONArray jsonArray = menuService.selectMenuList(menu);
+        return JsonResult.ok().put("data",jsonArray);
     }
 
 //    /**
@@ -55,6 +57,7 @@ public class MenuController extends BaseController
     @PostMapping("/add")
     public JsonResult addSave(@RequestBody Menu menu)
     {
+        menu.setCreateBy(SysUtils.getSysUser().getUserName());
         menuService.insertMenu(menu);
         return JsonResult.ok();
     }
@@ -66,6 +69,7 @@ public class MenuController extends BaseController
     @PostMapping("/edit")
     public JsonResult editSave(@RequestBody Menu menu)
     {
+        menu.setUpdateBy(SysUtils.getSysUser().getUserName());
         menuService.updateMenu(menu);
         return JsonResult.ok();
     }
@@ -83,7 +87,8 @@ public class MenuController extends BaseController
 
     @RequiresPermissions(value = "获取菜单树",authorities = "get:system:menu:treeSelect")
     @GetMapping("/treeSelect")
-    public JSONArray treeSelect(){
-        return menuService.queryMenuSelect();
+    public JsonResult treeSelect(){
+        JSONArray jsonArray = menuService.queryMenuSelect();
+        return JsonResult.ok().put("data",jsonArray);
     }
 }

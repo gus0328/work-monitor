@@ -35,6 +35,7 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @param dept 部门信息
      * @return 部门信息集合
      */
+    @Transactional
     @Override
     @DataScope(deptAlias = "d")
     public JSONArray selectDeptList(SysDept dept)
@@ -50,6 +51,7 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @param dept 部门信息
      * @return 所有部门信息
      */
+    @Transactional
     @Override
     @DataScope(deptAlias = "d")
     public List<Ztree> selectDeptTree(SysDept dept)
@@ -77,6 +79,7 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @param roleDeptList 角色已存在菜单列表
      * @return 树结构列表
      */
+    @Transactional
     public List<Ztree> initZtree(List<SysDept> deptList, List<String> roleDeptList)
     {
 
@@ -146,6 +149,7 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @param dept 部门信息
      * @return 结果
      */
+    @Transactional
     @Override
     public int insertDept(SysDept dept)
     {
@@ -195,6 +199,7 @@ public class SysDeptServiceImpl implements ISysDeptService
      * 
      * @param dept 当前部门
      */
+    @Transactional
     private void updateParentDeptStatus(SysDept dept)
     {
         String updateBy = dept.getUpdateBy();
@@ -210,6 +215,7 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @param newAncestors 新的父ID集合
      * @param oldAncestors 旧的父ID集合
      */
+    @Transactional
     public void updateDeptChildren(Long deptId, String newAncestors, String oldAncestors)
     {
         List<SysDept> children = deptMapper.selectChildrenDeptById(deptId);
@@ -241,6 +247,7 @@ public class SysDeptServiceImpl implements ISysDeptService
      * @param dept 部门信息
      * @return 结果
      */
+    @Transactional
     @Override
     public String checkDeptNameUnique(SysDept dept)
     {
@@ -253,6 +260,7 @@ public class SysDeptServiceImpl implements ISysDeptService
         return UserConstants.DEPT_NAME_UNIQUE;
     }
 
+    @Transactional
     @Override
     public JSONArray queryDeptSelect() {
         List<SelectModel> list = deptMapper.queryDeptSelect();

@@ -1,9 +1,6 @@
 package com.iccm.system.controller;
 
-import com.iccm.common.BaseController;
-import com.iccm.common.ExcelUtil;
-import com.iccm.common.JsonResult;
-import com.iccm.common.UserConstants;
+import com.iccm.common.*;
 import com.iccm.common.annotation.Log;
 import com.iccm.common.annotation.PermissionsApi;
 import com.iccm.common.annotation.RequiresPermissions;
@@ -41,11 +38,12 @@ public class SysDictTypeController extends BaseController
      */
     @RequiresPermissions(value = "查询字典类型",authorities = "post:system:dict:list")
     @PostMapping("/list")
-    public TableDataInfo list(@RequestBody SysDictType dictType)
+    public JsonResult list(@RequestBody SysDictType dictType)
     {
         startPage();
         List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
-        return getDataTable(list);
+        TableDataInfo tableDataInfo = getDataTable(list);
+        return JsonResult.ok().put("data",tableDataInfo);
     }
 
     /**
@@ -73,7 +71,7 @@ public class SysDictTypeController extends BaseController
         {
             return JsonResult.error("新增字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
-//        dict.setCreateBy(ShiroUtils.getLoginName());
+        dict.setCreateBy(SysUtils.getSysUser().getUserName());
         dictTypeService.insertDictType(dict);
         return JsonResult.ok();
     }
@@ -89,7 +87,7 @@ public class SysDictTypeController extends BaseController
         {
             return JsonResult.error("修改字典'" + dict.getDictName() + "'失败，字典类型已存在");
         }
-//        dict.setUpdateBy(ShiroUtils.getLoginName());
+        dict.setUpdateBy(SysUtils.getSysUser().getUserName());
         dictTypeService.updateDictType(dict);
         return JsonResult.ok();
     }
@@ -111,19 +109,9 @@ public class SysDictTypeController extends BaseController
      */
     @RequiresPermissions(value = "校验字典类型",authorities = "post:system:dict:checkDictTypeUnique")
     @PostMapping("/checkDictTypeUnique")
-    public String checkDictTypeUnique(SysDictType dictType)
+    public JsonResult checkDictTypeUnique(SysDictType dictType)
     {
-        return dictTypeService.checkDictTypeUnique(dictType);
+        return JsonResult.ok().put("data",dictTypeService.checkDictTypeUnique(dictType));
     }
 
-    /**
-     * 加载字典列表树
-     */
-    @RequiresPermissions(value = "加载字典列表树",authorities = "get:system:dict:treeData")
-    @GetMapping("/treeData")
-    public List<Ztree> treeData()
-    {
-        List<Ztree> ztrees = dictTypeService.selectDictTree(new SysDictType());
-        return ztrees;
-    }
 }

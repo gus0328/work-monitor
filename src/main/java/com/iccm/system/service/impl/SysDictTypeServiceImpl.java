@@ -94,6 +94,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
      * @param ids 需要删除的数据
      * @return 结果
      */
+    @Transactional
     @Override
     public int deleteDictTypeByIds(String ids) throws BusinessException
     {
@@ -143,6 +144,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
      * @param dict 字典类型
      * @return 结果
      */
+    @Transactional
     @Override
     public String checkDictTypeUnique(SysDictType dict)
     {
@@ -161,6 +163,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
      * @param dictType 字典类型
      * @return 所有字典类型
      */
+    @Transactional
     public List<Ztree> selectDictTree(SysDictType dictType)
     {
         List<Ztree> ztrees = new ArrayList<Ztree>();

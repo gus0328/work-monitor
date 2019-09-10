@@ -1,6 +1,10 @@
 package com.iccm.system.service;
 
+import com.alibaba.fastjson.JSONArray;
+import com.iccm.system.model.FormSelect;
 import com.iccm.system.model.Role;
+import com.iccm.system.model.SelectModel;
+
 import java.util.List;
 
 /**
@@ -58,4 +62,24 @@ public interface IRoleService
      * @return 结果
      */
     public int deleteRoleById(Long roleId);
+
+    /**
+     * 角色下拉
+     * @return
+     */
+    public List<FormSelect> roleSelect();
+
+    /**
+     * 根据roleId查询菜单
+     * @param roleId
+     * @return
+     */
+    public JSONArray queryMenusByRoleId(Long roleId);
+
+    /**
+     * 根据roleId查询权限
+     * @param roleId
+     * @return
+     */
+    public JSONArray queryAuthoritiesByRoleId(Long roleId);
 }

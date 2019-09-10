@@ -2,6 +2,8 @@ package com.iccm.system.controller;
 
 import com.iccm.common.JsonResult;
 import com.iccm.system.model.LoginParams;
+import com.iccm.system.service.LoginService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,17 +13,19 @@ import javax.servlet.http.HttpSession;
  * Created by Administrator on 2019/9/8.
  */
 @RestController
-@RequestMapping("/main")
+@RequestMapping("/login")
 public class LoginController {
 
-    @GetMapping("/user/info")
-    public JsonResult userInfo(HttpServletRequest request) {
-        String[] array = {"system","depart","dict","menu","anthorities"};
-        return JsonResult.ok().put("permission",array);
+    @Autowired
+    private LoginService loginService;
+
+    @PostMapping("/login")
+    public JsonResult login(@RequestBody LoginParams loginParams, HttpSession session,HttpServletRequest request) {
+        return loginService.login(loginParams,session,request);
     }
 
-    @PostMapping("/user/login")
-    public JsonResult login(@RequestBody LoginParams loginParams, HttpSession session) {
-        return JsonResult.ok("登录成功").put("access_token", "qweeeeeeeeeeeeeeeeeeeeeeeeee");
+    @GetMapping("/logout")
+    public void loginOut(HttpSession session){
+        session.invalidate();
     }
 }

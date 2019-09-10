@@ -1,6 +1,7 @@
 package com.iccm.system.mapper;
 
-import com.iccm.system.model.Role;
+import com.iccm.system.model.*;
+
 import java.util.List;
 
 /**
@@ -58,4 +59,24 @@ public interface RoleMapper
      * @return 结果
      */
     public int deleteRoleByIds(String[] roleIds);
+
+    /**
+     * 查询角色下拉
+     * @return
+     */
+    public List<FormSelect> roleSelect();
+
+    /**
+     * 根据id查询角色菜单
+     * @param roleId
+     * @return
+     */
+    public List<RoleMenuTree> queryMenuSelectById(Long roleId);
+
+    /**
+     * 根据id查询角色权限
+     * @param roleId
+     * @return
+     */
+    public List<RoleAuthorityTree> queryAuthoritiesById(Long roleId);
 }

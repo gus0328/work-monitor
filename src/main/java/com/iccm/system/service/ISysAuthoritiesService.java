@@ -1,6 +1,7 @@
 package com.iccm.system.service;
 
 import com.alibaba.fastjson.JSONArray;
+import com.iccm.common.JsonResult;
 import com.iccm.system.model.SysAuthorities;
 import java.util.List;
 
@@ -65,4 +66,10 @@ public interface ISysAuthoritiesService
      * @return
      */
     public int deleteAll();
+
+    /**
+     * 同步权限标识
+     * @return
+     */
+    public JsonResult sync();
 }

@@ -32,9 +32,6 @@ public class SysAuthoritiesController extends BaseController {
     @Autowired
     private ISysAuthoritiesService sysAuthoritiesService;
 
-    @Autowired
-    private WebApplicationContext applicationContext;
-
     /**
      * 查询权限标识列表
      */
@@ -101,27 +98,8 @@ public class SysAuthoritiesController extends BaseController {
      */
     @RequiresPermissions(value = "同步权限标识",authorities = "post:system:authorities:sync")
     @PostMapping("/sync")
-    public JsonResult getAllURL() {
-        Map<String,Object> beans = applicationContext.getBeansWithAnnotation(PermissionsApi.class);
-        sysAuthoritiesService.deleteAll();
-        long index = 0;
-        for(Object bean : beans.values()){
-            PermissionsApi permissionsApi = bean.getClass().getAnnotation(PermissionsApi.class);
-            SysAuthorities sysAuthorities = new SysAuthorities(permissionsApi.authorities(),permissionsApi.value(), Constants.SYS_AUTH_API,index,Constants.SYS_AUTH_API);
-            sysAuthoritiesService.insertSysAuthorities(sysAuthorities);
-            Method[] methods = bean.getClass().getDeclaredMethods();
-            long methodIndex = 0;
-            for (Method declaredMethod : methods) {
-                RequiresPermissions requiresPermissions = AnnotationUtils.findAnnotation(declaredMethod, RequiresPermissions.class);
-                if (requiresPermissions != null) {
-                    SysAuthorities sysAuthorities1 = new SysAuthorities(requiresPermissions.authorities(), requiresPermissions.value(), sysAuthorities.getAuthorityName(), methodIndex, sysAuthorities.getAuthority());
-                    sysAuthoritiesService.insertSysAuthorities(sysAuthorities1);
-                    methodIndex++;
-                }
-            }
-            index++;
-        }
-        return JsonResult.ok();
+    public JsonResult sync() {
+        return sysAuthoritiesService.sync();
     }
 
 }

@@ -3,6 +3,7 @@ package com.iccm.system.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.iccm.common.BaseController;
 import com.iccm.common.JsonResult;
+import com.iccm.common.SysUtils;
 import com.iccm.common.UserConstants;
 import com.iccm.common.annotation.PermissionsApi;
 import com.iccm.common.annotation.RequiresPermissions;
@@ -37,9 +38,10 @@ public class SysDeptController extends BaseController
      */
     @RequiresPermissions(value = "查询部门列表",authorities = "post:system:dept:list")
     @PostMapping("/list")
-    public JSONArray list(@RequestBody SysDept dept)
+    public JsonResult list(@RequestBody SysDept dept)
     {
-        return  deptService.selectDeptList(dept);
+        JSONArray jsonArray = deptService.selectDeptList(dept);
+        return JsonResult.ok().put("data",jsonArray);
     }
 
     /**
@@ -53,7 +55,7 @@ public class SysDeptController extends BaseController
         {
             return JsonResult.error("新增部门'" + dept.getDeptName() + "'失败，部门名称已存在");
         }
-//        dept.setCreateBy(ShiroUtils.getLoginName());
+        dept.setCreateBy(SysUtils.getSysUser().getUserName());
         deptService.insertDept(dept);
         return JsonResult.ok();
     }
@@ -73,7 +75,7 @@ public class SysDeptController extends BaseController
         {
             return JsonResult.error("修改部门'" + dept.getDeptName() + "'失败，上级部门不能是自己");
         }
-//        dept.setUpdateBy(ShiroUtils.getLoginName());
+        dept.setUpdateBy(SysUtils.getSysUser().getUserName());
         deptService.updateDept(dept);
         return JsonResult.ok();
     }
@@ -102,20 +104,9 @@ public class SysDeptController extends BaseController
      */
     @RequiresPermissions(value = "校验部门名称",authorities = "post:system:dept:checkDeptNameUnique")
     @PostMapping("/checkDeptNameUnique")
-    public String checkDeptNameUnique(@RequestBody SysDept dept)
+    public JsonResult checkDeptNameUnique(@RequestBody SysDept dept)
     {
-        return deptService.checkDeptNameUnique(dept);
-    }
-
-    /**
-     * 加载部门列表树
-     */
-    @RequiresPermissions(value = "加载部门列表树",authorities = "get:system:dept:treeData")
-    @GetMapping("/treeData")
-    public List<Ztree> treeData()
-    {
-        List<Ztree> ztrees = deptService.selectDeptTree(new SysDept());
-        return ztrees;
+        return JsonResult.ok().put("data",deptService.checkDeptNameUnique(dept));
     }
 
     /**
@@ -124,8 +115,9 @@ public class SysDeptController extends BaseController
      */
     @RequiresPermissions(value = "查询部门下拉",authorities = "get:system:dept:treeSelect")
     @GetMapping("/treeSelect")
-    public JSONArray treeSelect(){
-        return deptService.queryDeptSelect();
+    public JsonResult treeSelect(){
+        JSONArray jsonArray = deptService.queryDeptSelect();
+        return JsonResult.ok().put("data",jsonArray);
     }
 
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iccm.system.mapper.SessionMapper" >
+    <delete id="deleteAllSession">
+        DELETE FROM spring_session
+    </delete>
+
+    <select id="querySessionIdsByOutlinetime" parameterType="Object" resultType="String">
+        SELECT
+		SESSION_ID
+		FROM
+		spring_session
+		WHERE
+		EXPIRY_TIME &lt;= #{outlinetime}
+    </select>
+
+    <select id="querySessionIdBySessionId" parameterType="Object" resultType="String">
+        SELECT
+		SESSION_ID
+		FROM
+		spring_session
+		WHERE
+		SESSION_ID = #{sessionId}
+    </select>
+</mapper>

@@ -3,6 +3,7 @@ package com.iccm.system.controller;
 import com.iccm.common.BaseController;
 import com.iccm.common.ExcelUtil;
 import com.iccm.common.JsonResult;
+import com.iccm.common.SysUtils;
 import com.iccm.common.annotation.Log;
 import com.iccm.common.annotation.PermissionsApi;
 import com.iccm.common.annotation.RequiresPermissions;
@@ -41,11 +42,12 @@ public class SysDictDataController extends BaseController
      */
     @RequiresPermissions(value = "查询字典内容",authorities = "post:system:dict:data:list")
     @PostMapping("/list")
-    public TableDataInfo list(SysDictData dictData)
+    public JsonResult list(SysDictData dictData)
     {
         startPage();
         List<SysDictData> list = dictDataService.selectDictDataList(dictData);
-        return getDataTable(list);
+        TableDataInfo tableDataInfo = getDataTable(list);
+        return JsonResult.ok().put("data",tableDataInfo);
     }
 
     /**
@@ -55,10 +57,11 @@ public class SysDictDataController extends BaseController
      */
     @RequiresPermissions(value = "根据字典类型查询",authorities = "post:system:dict:data:list1")
     @PostMapping("/list1")
-    public List<SysDictData> list2(@RequestBody PostModel postModel){
+    public JsonResult list2(@RequestBody PostModel postModel){
         SysDictData sysDictData = new SysDictData();
         sysDictData.setDictType(postModel.getId());
-        return dictDataService.selectDictDataList(sysDictData);
+        List<SysDictData> list = dictDataService.selectDictDataList(sysDictData);
+        return JsonResult.ok().put("data",list);
     }
 
     /**
@@ -82,7 +85,7 @@ public class SysDictDataController extends BaseController
     @PostMapping("/add")
     public JsonResult addSave(@Validated @RequestBody SysDictData dict)
     {
-//        dict.setCreateBy(ShiroUtils.getLoginName());
+        dict.setCreateBy(SysUtils.getSysUser().getUserName());
         dictDataService.insertDictData(dict);
         return JsonResult.ok();
     }
@@ -94,7 +97,7 @@ public class SysDictDataController extends BaseController
     @PostMapping("/edit")
     public JsonResult editSave(@Validated @RequestBody SysDictData dict)
     {
-//        dict.setUpdateBy(ShiroUtils.getLoginName());
+        dict.setUpdateBy(SysUtils.getSysUser().getUserName());
         dictDataService.updateDictData(dict);
         return JsonResult.ok();
     }

@@ -1,20 +1,83 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iccm.system.mapper.RoleMapper">
-    
+
     <resultMap type="Role" id="RoleResult">
-        <result property="roleId"    column="role_id"    />
-        <result property="roleName"    column="role_name"    />
-        <result property="roleKey"    column="role_key"    />
-        <result property="roleSort"    column="role_sort"    />
-        <result property="createBy"    column="create_by"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="updateBy"    column="update_by"    />
-        <result property="updateTime"    column="update_time"    />
-        <result property="remark"    column="remark"    />
+        <result property="roleId" column="role_id"/>
+        <result property="roleName" column="role_name"/>
+        <result property="roleKey" column="role_key"/>
+        <result property="roleSort" column="role_sort"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
     </resultMap>
+
+    <resultMap type="FormSelect" id="selectModelResult">
+        <result property="value" column="role_id"/>
+        <result property="label" column="role_name"/>
+    </resultMap>
+
+    <resultMap type="RoleMenuTree" id="roleMenuResult">
+        <result property="menuId" column="menu_id"/>
+        <result property="menuTitle" column="menu_title"/>
+        <result property="menuUrl" column="menu_url"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="flag" column="flag"/>
+    </resultMap>
+
+    <resultMap type="RoleAuthorityTree" id="roleAuthorityResult">
+        <result property="authority" column="authority"/>
+        <result property="authorityName" column="authority_name"/>
+        <result property="parentUrl" column="parent_url"/>
+        <result property="flag" column="flag"/>
+    </resultMap>
+
+    <select id="queryAuthoritiesById" parameterType="Object" resultMap="roleAuthorityResult">
+          SELECT
+        sa.authority,
+        sa.authority_name,
+        sa.parent_url,
+        if(ISNULL(res1.role_id),'false','true') as flag
+    FROM
+        sys_authorities AS sa
+    LEFT OUTER JOIN (
+        SELECT
+            authority,
+            role_id
+        FROM
+            role_authority
+        WHERE
+            role_id = #{roleId}
+    ) AS res1 ON sa.authority = res1.authority
+    </select>
+
+    <select id="queryMenuSelectById" parameterType="Object" resultMap="roleMenuResult">
+            SELECT
+        m.menu_id,
+        m.menu_title,
+        m.menu_url,
+        m.parent_id,
+        if(ISNULL(res1.role_id),'false','true') as flag
+    FROM
+        menu AS m
+    LEFT OUTER JOIN (
+        SELECT
+            menu_id,
+            role_id
+        FROM
+            role_menu
+        WHERE
+            role_id = #{roleId}
+    ) AS res1 ON m.menu_id = res1.menu_id
+    </select>
+
+    <select id="roleSelect" resultMap="selectModelResult">
+        select role_id, role_name from role``
+    </select>
 
     <sql id="selectRoleVo">
         select role_id, role_name, role_key, role_sort, create_by, create_time, update_by, update_time, remark from role
@@ -22,18 +85,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectRoleList" parameterType="Role" resultMap="RoleResult">
         <include refid="selectRoleVo"/>
-        <where>  
-            <if test="roleName != null  and roleName != ''"> and role_name like concat('%', #{roleName}, '%')</if>
-            <if test="roleKey != null  and roleKey != ''"> and role_key = #{roleKey}</if>
-            <if test="roleSort != null "> and role_sort = #{roleSort}</if>
+        <where>
+            <if test="roleId != null  and roleKey != ''">and role_id = #{roleId}</if>
+            <if test="roleName != null  and roleName != ''">and role_name like concat('%', #{roleName}, '%')</if>
+            <if test="roleKey != null  and roleKey != ''">and role_key = #{roleKey}</if>
+            <if test="roleSort != null ">and role_sort = #{roleSort}</if>
         </where>
     </select>
-    
+
     <select id="selectRoleById" parameterType="Long" resultMap="RoleResult">
         <include refid="selectRoleVo"/>
         where role_id = #{roleId}
     </select>
-        
+
     <insert id="insertRole" parameterType="Role" useGeneratedKeys="true" keyProperty="roleId">
         insert into role
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -45,7 +109,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null  and updateBy != ''">update_by,</if>
             <if test="updateTime != null ">update_time,</if>
             <if test="remark != null  and remark != ''">remark,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="roleName != null  and roleName != ''">#{roleName},</if>
             <if test="roleKey != null  and roleKey != ''">#{roleKey},</if>
@@ -55,7 +119,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null  and updateBy != ''">#{updateBy},</if>
             <if test="updateTime != null ">#{updateTime},</if>
             <if test="remark != null  and remark != ''">#{remark},</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updateRole" parameterType="Role">
@@ -78,10 +142,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteRoleByIds" parameterType="String">
-        delete from role where role_id in 
+        delete from role where role_id in
         <foreach item="roleId" collection="array" open="(" separator="," close=")">
             #{roleId}
         </foreach>
     </delete>
-    
+
 </mapper>

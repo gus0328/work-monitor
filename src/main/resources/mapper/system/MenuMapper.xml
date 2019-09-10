@@ -26,6 +26,10 @@
         <result property="depart" column="parent_id"/>
     </resultMap>
 
+    <select id="queryMenuNameByMenuId" parameterType="Object" resultType="String">
+        SELECT menu_name FROM menu WHERE menu_id = #{menuId}
+    </select>
+
     <select id="queryMenuSelect" parameterType="Object" resultMap="selectModelResult">
         SELECT m.menu_id,m.menu_title,'true' as expand,parent_id from menu m
         order by m.parent_id, m.order_num

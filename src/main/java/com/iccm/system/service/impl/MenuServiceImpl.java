@@ -10,6 +10,7 @@ import com.iccm.system.model.SelectModel;
 import com.iccm.system.service.IMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -43,6 +44,7 @@ public class MenuServiceImpl implements IMenuService
      * @param menu 菜单
      * @return 菜单
      */
+    @Transactional
     @Override
     public JSONArray selectMenuList(Menu menu)
     {
@@ -104,6 +106,7 @@ public class MenuServiceImpl implements IMenuService
      * 查询菜单下拉
      * @return
      */
+    @Transactional
     @Override
     public JSONArray queryMenuSelect() {
         List<SelectModel> list = menuMapper.queryMenuSelect();

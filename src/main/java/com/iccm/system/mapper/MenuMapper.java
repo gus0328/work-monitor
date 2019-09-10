@@ -67,4 +67,11 @@ public interface MenuMapper
      * @return
      */
     public List<SelectModel> queryMenuSelect();
+
+    /**
+     * 根据menuId查询menuName
+     * @param menuId
+     * @return
+     */
+    public String queryMenuNameByMenuId(Long menuId);
 }
