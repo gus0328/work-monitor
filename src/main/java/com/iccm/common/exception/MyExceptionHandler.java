@@ -17,32 +17,32 @@ public class MyExceptionHandler {
     private Logger logger = LoggerFactory.getLogger("MyExceptionHandler");
 
     @ExceptionHandler(LoginException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public LoginException loginExceptionHandle(LoginException ex) {
-        return ex;
+    @ResponseStatus(HttpStatus.OK)
+    public JsonResult loginExceptionHandle(LoginException ex) {
+        return JsonResult.error(ex.getCode(),ex.getMessage());
     }
 
     @ExceptionHandler(PermissionsException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public PermissionsException permissionsExceptionHandle(PermissionsException ex){
-        return ex;
+    @ResponseStatus(HttpStatus.OK)
+    public JsonResult permissionsExceptionHandle(PermissionsException ex){
+        return JsonResult.error(403,ex.getMessage());
     }
 
     @ExceptionHandler(ParameterException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ParameterException parameterExceptionHandle(ParameterException ex){
-        return ex;
+    @ResponseStatus(HttpStatus.OK)
+    public JsonResult parameterExceptionHandle(ParameterException ex){
+        return JsonResult.error(ex.getCode(),ex.getMessage());
     }
 
     @ExceptionHandler(BusinessException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public BusinessException businessExceptionHandle(BusinessException ex){
-        return ex;
+    @ResponseStatus(HttpStatus.OK)
+    public JsonResult businessExceptionHandle(BusinessException ex){
+        return JsonResult.error(ex.getCode(),ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.OK)
     public JsonResult exceptionHandle(Exception ex){
-        return JsonResult.error().put("message","系统内部发生异常");
+        return JsonResult.error(500,"系统内部发生异常");
     }
 }

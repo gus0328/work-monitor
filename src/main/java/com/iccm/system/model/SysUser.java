@@ -87,6 +87,8 @@ public class SysUser extends BaseEntity
 
     private List<Role> roles;
 
+    private Long[] postIds;
+
     /** 角色组 */
     private Long[] roleIds;
 
@@ -115,5 +117,20 @@ public class SysUser extends BaseEntity
     {
         return phonenumber;
     }
+
+    /**
+     * 岗位组
+     */
+    private String postNames;
+
+    /**
+     * 角色组
+     */
+    private String roleNames;
+
+    /**
+     * 重复密码
+     */
+    private String rpassword;
 
 }

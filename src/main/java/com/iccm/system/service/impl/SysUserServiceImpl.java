@@ -1,16 +1,15 @@
 package com.iccm.system.service.impl;
 
 import com.iccm.common.Convert;
+import com.iccm.common.SysUtils;
 import com.iccm.common.UserConstants;
 import com.iccm.common.annotation.DataScope;
 import com.iccm.common.exception.BusinessException;
+import com.iccm.common.properties.SystemProperties;
 import com.iccm.common.utils.Md5Utils;
 import com.iccm.common.utils.StringUtils;
-import com.iccm.system.mapper.RoleMapper;
-import com.iccm.system.mapper.SysUserMapper;
-import com.iccm.system.mapper.SysUserRoleMapper;
-import com.iccm.system.model.SysUser;
-import com.iccm.system.model.SysUserRole;
+import com.iccm.system.mapper.*;
+import com.iccm.system.model.*;
 import com.iccm.system.service.ISysUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +25,7 @@ import java.util.List;
  * 
  * @author ruoyi
  */
-@Service
+@Service("sysUserService")
 public class SysUserServiceImpl implements ISysUserService
 {
     private static final Logger log = LoggerFactory.getLogger(SysUserServiceImpl.class);
@@ -40,10 +39,19 @@ public class SysUserServiceImpl implements ISysUserService
     @Autowired
     private SysUserRoleMapper userRoleMapper;
 
+    @Autowired
+    private SysUserPostMapper userPostMapper;
+
+    @Autowired
+    private SystemProperties systemProperties;
+
+    @Autowired
+    private SysPostMapper postMapper;
+
 
     /**
      * 根据条件分页查询用户列表
-     * 
+     *
      * @param user 用户信息
      * @return 用户信息集合信息
      */
@@ -56,7 +64,7 @@ public class SysUserServiceImpl implements ISysUserService
 
     /**
      * 根据条件分页查询已分配用户角色列表
-     * 
+     *
      * @param user 用户信息
      * @return 用户信息集合信息
      */
@@ -68,7 +76,7 @@ public class SysUserServiceImpl implements ISysUserService
 
     /**
      * 根据条件分页查询未分配用户角色列表
-     * 
+     *
      * @param user 用户信息
      * @return 用户信息集合信息
      */
@@ -80,7 +88,7 @@ public class SysUserServiceImpl implements ISysUserService
 
     /**
      * 通过用户名查询用户
-     * 
+     *
      * @param userName 用户名
      * @return 用户对象信息
      */
@@ -92,7 +100,7 @@ public class SysUserServiceImpl implements ISysUserService
 
     /**
      * 通过手机号码查询用户
-     * 
+     *
      * @param phoneNumber 手机号码
      * @return 用户对象信息
      */
@@ -104,7 +112,7 @@ public class SysUserServiceImpl implements ISysUserService
 
     /**
      * 通过邮箱查询用户
-     * 
+     *
      * @param email 邮箱
      * @return 用户对象信息
      */
@@ -116,7 +124,7 @@ public class SysUserServiceImpl implements ISysUserService
 
     /**
      * 通过用户ID查询用户
-     * 
+     *
      * @param userId 用户ID
      * @return 用户对象信息
      */
@@ -128,7 +136,7 @@ public class SysUserServiceImpl implements ISysUserService
 
     /**
      * 通过用户ID删除用户
-     * 
+     *
      * @param userId 用户ID
      * @return 结果
      */
@@ -137,12 +145,14 @@ public class SysUserServiceImpl implements ISysUserService
     {
         // 删除用户与角色关联
         userRoleMapper.deleteUserRoleByUserId(userId);
+        // 删除用户与岗位表
+        userPostMapper.deleteUserPostByUserId(userId);
         return userMapper.deleteUserById(userId);
     }
 
     /**
      * 批量删除用户信息
-     * 
+     *
      * @param ids 需要删除的数据ID
      * @return 结果
      */
@@ -155,7 +165,7 @@ public class SysUserServiceImpl implements ISysUserService
 
     /**
      * 新增保存用户信息
-     * 
+     *
      * @param user 用户信息
      * @return 结果
      */
@@ -165,6 +175,8 @@ public class SysUserServiceImpl implements ISysUserService
     {
         // 新增用户信息
         int rows = userMapper.insertUser(user);
+        // 新增用户岗位关联
+        insertUserPost(user);
         // 新增用户与角色管理
         insertUserRole(user);
         return rows;
@@ -172,7 +184,7 @@ public class SysUserServiceImpl implements ISysUserService
 
     /**
      * 修改保存用户信息
-     * 
+     *
      * @param user 用户信息
      * @return 结果
      */
@@ -185,12 +197,16 @@ public class SysUserServiceImpl implements ISysUserService
         userRoleMapper.deleteUserRoleByUserId(userId);
         // 新增用户与角色管理
         insertUserRole(user);
+        // 删除用户与岗位关联
+        userPostMapper.deleteUserPostByUserId(userId);
+        // 新增用户与岗位管理
+        insertUserPost(user);
         return userMapper.updateUser(user);
     }
 
     /**
      * 修改用户个人详细信息
-     * 
+     *
      * @param user 用户信息
      * @return 结果
      */
@@ -202,7 +218,7 @@ public class SysUserServiceImpl implements ISysUserService
 
     /**
      * 修改用户密码
-     * 
+     *
      * @param user 用户信息
      * @return 结果
      */
@@ -214,10 +230,9 @@ public class SysUserServiceImpl implements ISysUserService
 
     /**
      * 新增用户角色信息
-     * 
+     *
      * @param user 用户对象
      */
-    @Transactional
     public void insertUserRole(SysUser user)
     {
         Long[] roles = user.getRoleIds();
@@ -240,8 +255,34 @@ public class SysUserServiceImpl implements ISysUserService
     }
 
     /**
+     * 新增用户岗位信息
+     *
+     * @param user 用户对象
+     */
+    public void insertUserPost(SysUser user)
+    {
+        Long[] posts = user.getPostIds();
+        if (StringUtils.isNotNull(posts))
+        {
+            // 新增用户与岗位管理
+            List<SysUserPost> list = new ArrayList<SysUserPost>();
+            for (Long postId : posts)
+            {
+                SysUserPost up = new SysUserPost();
+                up.setUserId(user.getUserId());
+                up.setPostId(postId);
+                list.add(up);
+            }
+            if (list.size() > 0)
+            {
+                userPostMapper.batchUserPost(list);
+            }
+        }
+    }
+
+    /**
      * 校验登录名称是否唯一
-     * 
+     *
      * @param loginName 用户名
      * @return
      */
@@ -293,14 +334,69 @@ public class SysUserServiceImpl implements ISysUserService
     }
 
     /**
+     * 查询用户所属角色组
+     *
+     * @param sysUser 用户
+     * @return 结果
+     */
+    @Override
+    public void setRoleInfo(SysUser sysUser)
+    {
+        List<Role> list = roleMapper.selectRolesByUserId(sysUser.getUserId());
+        List<Long> roleIds = new ArrayList<>();
+        StringBuffer idsStr = new StringBuffer();
+        Long[] longs = new Long[]{};
+        for (Role role : list)
+        {
+            idsStr.append(role.getRoleName()).append(",");
+            roleIds.add(role.getRoleId());
+        }
+        if (StringUtils.isNotEmpty(idsStr.toString()))
+        {
+            sysUser.setRoleNames(idsStr.substring(0, idsStr.length() - 1));
+            longs = roleIds.toArray(longs);
+        }else{
+            sysUser.setRoleNames(idsStr.toString());
+        }
+        sysUser.setRoleIds(longs);
+    }
+
+    /**
+     * 查询用户所属岗位组
+     *
+     * @param sysUser
+     * @return 结果
+     */
+    @Override
+    public void setPostInfo(SysUser sysUser)
+    {
+        List<SysPost> list = postMapper.selectPostsByUserId(sysUser.getUserId());
+        List<Long> postIds = new ArrayList<>();
+        StringBuffer idsStr = new StringBuffer();
+        Long[] longs = new Long[]{};
+        for (SysPost post : list)
+        {
+            idsStr.append(post.getPostName()).append(",");
+            postIds.add(post.getPostId());
+        }
+        if (StringUtils.isNotEmpty(idsStr.toString()))
+        {
+            sysUser.setPostNames(idsStr.substring(0, idsStr.length() - 1));
+            longs = postIds.toArray(longs);
+        }else{
+            sysUser.setPostNames(idsStr.toString());
+        }
+        sysUser.setPostIds(longs);
+    }
+
+    /**
      * 导入用户数据
-     * 
+     *
      * @param userList 用户数据列表
      * @param isUpdateSupport 是否更新支持，如果已存在，则进行更新数据
      * @param operName 操作用户
      * @return 结果
      */
-    @Transactional
     @Override
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName)
     {
@@ -312,7 +408,7 @@ public class SysUserServiceImpl implements ISysUserService
         int failureNum = 0;
         StringBuilder successMsg = new StringBuilder();
         StringBuilder failureMsg = new StringBuilder();
-        String password = "123456";
+        String password = systemProperties.getInitPass();
         for (SysUser user : userList)
         {
             try
@@ -362,7 +458,7 @@ public class SysUserServiceImpl implements ISysUserService
 
     /**
      * 用户状态修改
-     * 
+     *
      * @param user 用户信息
      * @return 结果
      */

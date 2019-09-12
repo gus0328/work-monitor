@@ -5,12 +5,16 @@ import com.iccm.common.*;
 import com.iccm.common.annotation.PermissionsApi;
 import com.iccm.common.annotation.RequiresPermissions;
 import com.iccm.common.page.TableDataInfo;
+import com.iccm.common.properties.SystemProperties;
+import com.iccm.common.utils.StringUtil;
 import com.iccm.system.model.PostModel;
 import com.iccm.system.model.ResetPwd;
 import com.iccm.system.model.SysUser;
 import com.iccm.system.service.IRoleService;
 import com.iccm.system.service.ISysUserService;
 import com.wangfan.endecrypt.utils.EndecryptUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,17 +41,35 @@ public class SysUserController extends BaseController
     @Autowired
     private IRoleService roleService;
 
-    @RequiresPermissions("post:system:user:list")
+    @Autowired
+    private SystemProperties systemProperties;
+
+    /**
+     * 分页查询用户
+     * @param user
+     * @return
+     */
+    @RequiresPermissions(value = "分页查询用户", authorities = "post:system:user:list")
     @PostMapping("/list")
     public JsonResult list(@RequestBody SysUser user)
     {
         startPage();
         List<SysUser> list = userService.selectUserList(user);
+        list.forEach(sysUser -> {
+            userService.setPostInfo(sysUser);
+            userService.setRoleInfo(sysUser);
+            sysUser.setRpassword(sysUser.getPassword());
+        });
         TableDataInfo tableDataInfo = getDataTable(list);
         return JsonResult.ok().put("data",tableDataInfo);
     }
 
-    @RequiresPermissions("post:system:user:export")
+    /**
+     * 导出用户数据
+     * @param user
+     * @return
+     */
+    @RequiresPermissions(value = "导出用户数据", authorities = "post:system:user:export")
     @PostMapping("/export")
     public JsonResult export(@RequestBody SysUser user)
     {
@@ -56,7 +78,14 @@ public class SysUserController extends BaseController
         return util.exportExcel(list, "用户数据");
     }
 
-    @RequiresPermissions("post:system:user:import")
+    /**
+     * 导入用户数据
+     * @param file
+     * @param updateSupport
+     * @return
+     * @throws Exception
+     */
+    @RequiresPermissions(value = "导入用户数据", authorities = "post:system:user:importData")
     @PostMapping("/importData")
     public JsonResult importData(MultipartFile file, boolean updateSupport) throws Exception
     {
@@ -67,7 +96,11 @@ public class SysUserController extends BaseController
         return JsonResult.ok(message);
     }
 
-    @RequiresPermissions("get:system:user:view")
+    /**
+     * 导入数据模板
+     * @return
+     */
+    @RequiresPermissions(value = "导入数据模板", authorities = "post:system:user:importTemplate")
     @GetMapping("/importTemplate")
     public JsonResult importTemplate()
     {
@@ -78,7 +111,7 @@ public class SysUserController extends BaseController
     /**
      * 新增保存用户
      */
-    @RequiresPermissions("post:system:user:add")
+    @RequiresPermissions(value = "新增保存用户", authorities = "post:system:user:add")
     @PostMapping("/add")
     public JsonResult addSave(@Validated @RequestBody SysUser user)
     {
@@ -103,7 +136,7 @@ public class SysUserController extends BaseController
     /**
      * 修改保存用户
      */
-    @RequiresPermissions("edit:system:user:edit")
+    @RequiresPermissions(value = "修改保存用户", authorities = "post:system:user:edit")
     @PostMapping("/edit")
     public JsonResult editSave(@Validated @RequestBody SysUser user)
     {
@@ -115,18 +148,21 @@ public class SysUserController extends BaseController
         {
             return JsonResult.error("修改用户'" + user.getLoginName() + "'失败，邮箱账号已存在");
         }
+        if(StringUtils.isNotBlank(user.getPassword())&&user.getPassword().length()<30){
+            user.setPassword(EndecryptUtils.encrytMd5(user.getPassword()));
+        }
         user.setUpdateBy(SysUtils.getSysUser().getUserName());
         userService.updateUser(user);
         return JsonResult.ok();
     }
 
-    @RequiresPermissions("post:system:user:resetPwd")
     @PostMapping("/resetPwd")
     public JsonResult resetPwdSave(HttpSession session,@Validated @RequestBody ResetPwd resetPwd)
     {
         SysUser sysUser = SysUtils.getSysUser();
         if(sysUser.getPassword().equals(EndecryptUtils.encrytMd5(resetPwd.getOldPassword()))){
             sysUser.setPassword(EndecryptUtils.encrytMd5(resetPwd.getNewPassword()));
+            sysUser.setUpdateBy(SysUtils.getSysUser().getUserName());
             userService.resetUserPwd(sysUser);
             session.setAttribute("user",sysUser);
             return JsonResult.ok();
@@ -134,7 +170,22 @@ public class SysUserController extends BaseController
         return JsonResult.error();
     }
 
-    @RequiresPermissions("post:system:user:remove")
+    @PostMapping("/adminResetPwd")
+    public JsonResult resetPwd(@RequestBody PostModel postModel){
+        SysUser sysUser = new SysUser();
+        sysUser.setUserId(Long.parseLong(postModel.getId()));
+        sysUser.setPassword(EndecryptUtils.encrytMd5(systemProperties.getInitPass()));
+        sysUser.setUpdateBy(SysUtils.getSysUser().getUserName());
+        userService.updateUserInfo(sysUser);
+        return JsonResult.ok("用户密码已重置");
+    }
+
+    /**
+     * 删除用户
+     * @param postModel
+     * @return
+     */
+    @RequiresPermissions(value = "删除用户", authorities = "post:system:user:remove")
     @PostMapping("/remove")
     public JsonResult remove(@RequestBody PostModel postModel)
     {
@@ -179,10 +230,11 @@ public class SysUserController extends BaseController
     /**
      * 用户状态修改
      */
-    @RequiresPermissions("post:system:user:changeStatus")
+    @RequiresPermissions(value = "用户状态修改", authorities = "post:system:user:changeStatus")
     @PostMapping("/changeStatus")
     public JsonResult changeStatus(@RequestBody SysUser user)
     {
+        user.setUpdateBy(SysUtils.getSysUser().getUserName());
         userService.changeStatus(user);
         return JsonResult.ok();
     }

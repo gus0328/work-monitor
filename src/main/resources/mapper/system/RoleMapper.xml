@@ -36,6 +36,26 @@
         <result property="flag" column="flag"/>
     </resultMap>
 
+    <select id="selectRolesByUserId" parameterType="Object" resultMap="RoleResult">
+        SELECT
+        role_id,
+        role_name,
+        role_key,
+        role_sort,
+        remark
+        FROM
+	    role
+        WHERE
+	    role_id IN (
+		SELECT
+			role_id
+		FROM
+			sys_user_role
+		WHERE
+			user_id = #{userId}
+	    )
+    </select>
+
     <select id="queryAuthoritiesById" parameterType="Object" resultMap="roleAuthorityResult">
           SELECT
         sa.authority,

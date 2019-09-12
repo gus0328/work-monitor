@@ -15,7 +15,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectRoleAuthorityList" parameterType="RoleAuthority" resultMap="RoleAuthorityResult">
         <include refid="selectRoleAuthorityVo"/>
-        <where>  
+        <where>
         </where>
     </select>
     
@@ -58,5 +58,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <delete id="deleteRoleAuthByRoleIdAndAuth" parameterType="Object">
         delete from role_authority where role_id = #{roleId} and authority = #{authority}
     </delete>
+
+    <select id="verifyIsHasAuth" parameterType="Object" resultType="Integer">
+        select count(*) from role_authority where role_id = #{roleId} and authority = #{authority}
+    </select>
     
 </mapper>

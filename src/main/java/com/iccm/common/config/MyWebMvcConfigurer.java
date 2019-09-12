@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 /**
  * Created by wangfan on 2019-01-04 下午 3:40.
@@ -38,6 +39,13 @@ public class MyWebMvcConfigurer implements WebMvcConfigurer {
         registry.addInterceptor(loggerInterceptor()).addPathPatterns("/**").excludePathPatterns("/login/*").excludePathPatterns("/captcha/captchaImage");
     }
 
-
+    /**
+     * webSocket
+     * @return
+     */
+    @Bean
+    public ServerEndpointExporter serverEndpointExporter() {
+        return new ServerEndpointExporter();
+    }
 
 }

@@ -38,12 +38,19 @@ public class LoginInterceptor implements HandlerInterceptor {
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object arg2)throws Exception{
+		StringBuffer url = request.getRequestURL();
 		HttpSession session = request.getSession();
 		SysUser user =  (SysUser) session.getAttribute("user");
 		if(user == null){
 			throw new LoginException(401,"用户未登录");
 		}else{
-			String sessionId = (String)cacheManager.getCache(CacheName.SESSIONS).get(user.getUserId()).get();
+			String sessionId = "";
+			try{
+				sessionId = (String)cacheManager.getCache(CacheName.SESSIONS).get(user.getUserId()).get();
+			}catch (NullPointerException e){
+				session.invalidate();
+				throw new LoginException(466,"系统已重启，您需要重新登录");
+			}
 			if(!session.getId().equals(sessionId)){
 				session.removeAttribute("user");
 				throw new LoginException(401,"用户被踢下线");

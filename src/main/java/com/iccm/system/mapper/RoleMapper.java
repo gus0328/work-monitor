@@ -79,4 +79,11 @@ public interface RoleMapper
      * @return
      */
     public List<RoleAuthorityTree> queryAuthoritiesById(Long roleId);
+
+    /**
+     * 根据用户id查询角色信息
+     * @param userId
+     * @return
+     */
+    public List<Role> selectRolesByUserId(Long userId);
 }

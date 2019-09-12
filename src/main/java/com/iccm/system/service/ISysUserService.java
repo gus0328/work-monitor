@@ -158,4 +158,20 @@ public interface ISysUserService
      * @return 结果
      */
     public int changeStatus(SysUser user);
+
+    /**
+     * 查询用户所属角色组
+     *
+     * @param sysUser 用户
+     * @return 结果
+     */
+    public void setRoleInfo(SysUser sysUser);
+
+    /**
+     * 查询用户所属岗位组
+     *
+     * @param sysUser 用户
+     * @return 结果
+     */
+    public void setPostInfo(SysUser sysUser);
 }

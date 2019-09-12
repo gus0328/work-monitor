@@ -1,6 +1,8 @@
 package com.iccm.system.mapper;
 
 import com.iccm.system.model.RoleAuthority;
+import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 
 /**
@@ -64,5 +66,12 @@ public interface RoleAuthorityMapper
      * @return
      */
     public int deleteRoleAuthByRoleIdAndAuth(RoleAuthority roleAuthority);
+
+    /**
+     * 验证是否有授权
+     * @param roleAuthority
+     * @return
+     */
+    public int verifyIsHasAuth(RoleAuthority roleAuthority);
 
 }
