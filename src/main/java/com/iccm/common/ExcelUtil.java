@@ -2,8 +2,8 @@ package com.iccm.common;
 
 import com.iccm.common.annotation.Excel;
 import com.iccm.common.annotation.Excels;
-import com.iccm.common.config.Global;
 import com.iccm.common.exception.BusinessException;
+import com.iccm.common.properties.SystemProperties;
 import com.iccm.common.utils.ReflectUtils;
 import com.iccm.common.utils.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -650,7 +650,7 @@ public class ExcelUtil<T>
      */
     public String getAbsoluteFile(String filename)
     {
-        String downloadPath = new Global().getDownPath() + filename;
+        String downloadPath = SpringContextHolder.getBean(SystemProperties.class).getDownPath() + filename;
         File desc = new File(downloadPath);
         if (!desc.getParentFile().exists())
         {

@@ -4,15 +4,21 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.code.kaptcha.Constants;
 import com.iccm.common.CacheName;
 import com.iccm.common.JsonResult;
+import com.iccm.common.ServletUtils;
 import com.iccm.common.TokenUtils;
+import com.iccm.common.config.ApplicationListener;
 import com.iccm.common.properties.SystemProperties;
+import com.iccm.common.utils.AddressUtils;
 import com.iccm.common.utils.IpUtils;
 import com.iccm.common.websocket.MessageDeal;
 import com.iccm.common.websocket.MessageType;
 import com.iccm.common.websocket.SystemNoticeType;
+import com.iccm.system.mapper.SysLogininforMapper;
 import com.iccm.system.model.LoginParams;
+import com.iccm.system.model.SysLogininfor;
 import com.iccm.system.model.SysUser;
 import com.wangfan.endecrypt.utils.EndecryptUtils;
+import eu.bitwalker.useragentutils.UserAgent;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
@@ -41,21 +47,55 @@ public class LoginService {
     @Autowired
     private SystemProperties systemProperties;
 
+    @Autowired
+    private SysLogininforMapper sysLogininforMapper;
+
+
+    final UserAgent userAgent = UserAgent.parseUserAgentString(ServletUtils.getRequest().getHeader("User-Agent"));
+
     @Transactional
     public JsonResult login(LoginParams loginParams, HttpSession session, HttpServletRequest request) {
+        JsonResult jsonResult = null;
         if(!session.getAttribute(Constants.KAPTCHA_SESSION_KEY).equals(loginParams.getValidateCode())){
-            return JsonResult.error("验证码错误");
+            jsonResult = JsonResult.error("验证码错误");
         }
         SysUser user = sysUserService.selectUserByLoginName(loginParams.getUsername());
         if (user == null) {
-            return JsonResult.error("账号不存在");
+            jsonResult = JsonResult.error("账号不存在");
         } else if (!user.getPassword().equals(EndecryptUtils.encrytMd5(loginParams.getPassword()))) {
-            return JsonResult.error("密码错误");
+            jsonResult = JsonResult.error("密码错误");
         } else if ("1".equals(user.getStatus())) {
-            return JsonResult.error("账号被锁定");
+            jsonResult = JsonResult.error("账号被锁定");
+        }
+        String ip = IpUtils.getIpAddr(request);
+        Date loginDate = new Date();
+        SysLogininfor sysLogininfor = new SysLogininfor();
+        sysLogininfor.setLoginTime(loginDate);
+        if(jsonResult!=null){
+            sysLogininfor.setStatus("1");
+            sysLogininfor.setMsg((String)jsonResult.get("msg"));
+        }else{
+            sysLogininfor.setStatus("0");
+            sysLogininfor.setMsg("登录成功");
+        }
+        //异步添加登录日志
+        ApplicationListener.executorService.submit(() ->{
+            try{
+                sysLogininfor.setLoginName(loginParams.getUsername());
+                sysLogininfor.setIpaddr(ip);
+                sysLogininfor.setLoginLocation(AddressUtils.getRealAddressByIP(ip));
+                sysLogininfor.setBrowser(userAgent.getBrowser().getName());
+                sysLogininfor.setOs(userAgent.getOperatingSystem().getName());
+                sysLogininforMapper.insertLogininfor(sysLogininfor);
+            }catch (Exception e){
+                //不做处理
+            }
+        });
+        if(jsonResult!=null){
+            return jsonResult;
         }
         user.setLoginIp(IpUtils.getIpAddr(request));
-        user.setLoginDate(new Date());
+        user.setLoginDate(loginDate);
         user.setSalt(session.getId());
         session.setMaxInactiveInterval(systemProperties.getSessionTime());
         sysUserService.updateUserInfo(user);

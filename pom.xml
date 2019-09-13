@@ -20,6 +20,7 @@
         <java.version>1.8</java.version>
         <kaptcha.version>2.3.2</kaptcha.version>
         <pagehelper.boot.version>1.2.5</pagehelper.boot.version>
+        <bitwalker.version>1.19</bitwalker.version>
     </properties>
 
     <dependencies>
@@ -168,6 +169,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!-- 解析客户端操作系统、浏览器等 -->
+        <dependency>
+            <groupId>eu.bitwalker</groupId>
+            <artifactId>UserAgentUtils</artifactId>
+            <version>${bitwalker.version}</version>
         </dependency>
 
     </dependencies>

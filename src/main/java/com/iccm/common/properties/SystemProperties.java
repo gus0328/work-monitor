@@ -17,4 +17,10 @@ public class SystemProperties {
     private int sessionTime;
 
     private String initPass;
+
+    private String downPath;
+
+    private boolean addressEnabled;
+
+    private String ipUrl;
 }
