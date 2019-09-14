@@ -1,6 +1,7 @@
 package com.iccm.common;
 
 import com.iccm.common.properties.TokenKey;
+import com.iccm.common.utils.UUIDUtil;
 import com.wangfan.endecrypt.utils.EndecryptUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
@@ -20,5 +21,9 @@ public class TokenUtils {
 
     public String createPcToken(String userCode,String sessionId){
         return EndecryptUtils.encrytMd5(userCode+sessionId+tokenKey.getPcToken());
+    }
+
+    public String createAppToken(){
+        return EndecryptUtils.encrytMd5(UUIDUtil.randomUUID32()+tokenKey.getAppToken());
     }
 }

@@ -23,4 +23,6 @@ public class SystemProperties {
     private boolean addressEnabled;
 
     private String ipUrl;
+
+    private int appTokenTime;
 }

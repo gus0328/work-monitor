@@ -7,6 +7,7 @@ import com.iccm.common.JsonResult;
 import com.iccm.common.ServletUtils;
 import com.iccm.common.TokenUtils;
 import com.iccm.common.config.ApplicationListener;
+import com.iccm.common.enums.OperatorType;
 import com.iccm.common.properties.SystemProperties;
 import com.iccm.common.utils.AddressUtils;
 import com.iccm.common.utils.IpUtils;
@@ -14,6 +15,7 @@ import com.iccm.common.websocket.MessageDeal;
 import com.iccm.common.websocket.MessageType;
 import com.iccm.common.websocket.SystemNoticeType;
 import com.iccm.system.mapper.SysLogininforMapper;
+import com.iccm.system.model.AppTokenInfo;
 import com.iccm.system.model.LoginParams;
 import com.iccm.system.model.SysLogininfor;
 import com.iccm.system.model.SysUser;
@@ -50,9 +52,6 @@ public class LoginService {
     @Autowired
     private SysLogininforMapper sysLogininforMapper;
 
-
-    final UserAgent userAgent = UserAgent.parseUserAgentString(ServletUtils.getRequest().getHeader("User-Agent"));
-
     @Transactional
     public JsonResult login(LoginParams loginParams, HttpSession session, HttpServletRequest request) {
         JsonResult jsonResult = null;
@@ -67,10 +66,9 @@ public class LoginService {
         } else if ("1".equals(user.getStatus())) {
             jsonResult = JsonResult.error("账号被锁定");
         }
-        String ip = IpUtils.getIpAddr(request);
-        Date loginDate = new Date();
         SysLogininfor sysLogininfor = new SysLogininfor();
-        sysLogininfor.setLoginTime(loginDate);
+        sysLogininfor.setLoginName(loginParams.getUsername());
+        sysLogininfor.setLoginTime(new Date());
         if(jsonResult!=null){
             sysLogininfor.setStatus("1");
             sysLogininfor.setMsg((String)jsonResult.get("msg"));
@@ -78,24 +76,43 @@ public class LoginService {
             sysLogininfor.setStatus("0");
             sysLogininfor.setMsg("登录成功");
         }
-        //异步添加登录日志
-        ApplicationListener.executorService.submit(() ->{
-            try{
-                sysLogininfor.setLoginName(loginParams.getUsername());
-                sysLogininfor.setIpaddr(ip);
-                sysLogininfor.setLoginLocation(AddressUtils.getRealAddressByIP(ip));
-                sysLogininfor.setBrowser(userAgent.getBrowser().getName());
-                sysLogininfor.setOs(userAgent.getOperatingSystem().getName());
-                sysLogininforMapper.insertLogininfor(sysLogininfor);
-            }catch (Exception e){
-                //不做处理
+        user.setLoginIp(sysLogininfor.getIpaddr());
+        user.setLoginDate(sysLogininfor.getLoginTime());
+        String type = request.getHeader("request_source");
+        if("PC".equals(type)){
+            //保存日志
+            sysLogininfor.setLoginSource(OperatorType.MANAGE.getName());
+            saveLoginLog(sysLogininfor,request);
+            if(jsonResult!=null){
+                return jsonResult;
             }
-        });
-        if(jsonResult!=null){
-            return jsonResult;
+            return pcLogin(loginParams,session,user);
+        }else if("APP".equals(type)){
+            sysLogininfor.setLoginSource(OperatorType.MOBILE.getName());
+            saveLoginLog(sysLogininfor,request);
+            if(jsonResult!=null){
+                return jsonResult;
+            }
+            return appLogin(user,sysLogininfor.getLoginTime());
+        }else if("OTHER".equals(type)){
+            sysLogininfor.setLoginSource(OperatorType.OTHER.getName());
+            saveLoginLog(sysLogininfor,request);
+            if(jsonResult!=null){
+                return jsonResult;
+            }
+            return otherLogin();
         }
-        user.setLoginIp(IpUtils.getIpAddr(request));
-        user.setLoginDate(loginDate);
+        return JsonResult.error("未知来源登录");
+    }
+
+    /**
+     * pc登录
+     * @param loginParams
+     * @param session
+     * @param user
+     * @return
+     */
+    public JsonResult pcLogin(LoginParams loginParams, HttpSession session,SysUser user){
         user.setSalt(session.getId());
         session.setMaxInactiveInterval(systemProperties.getSessionTime());
         sysUserService.updateUserInfo(user);
@@ -118,4 +135,47 @@ public class LoginService {
         return JsonResult.ok("登录成功").put("access_token",token);
     }
 
+    /**
+     * app登录
+     * @param user
+     * @param loginDate
+     * @return
+     */
+    public JsonResult appLogin(SysUser user,Date loginDate){
+        AppTokenInfo appTokenInfo = new AppTokenInfo();
+        appTokenInfo.setTime(loginDate.getTime());
+        appTokenInfo.setSysUser(user);
+        String token = tokenUtils.createAppToken();
+        cacheManager.getCache(CacheName.APPTOKENS).put(token,appTokenInfo);
+        return JsonResult.ok("登录成功").put("access_token",token);
+    }
+
+    /**
+     * 保存日志
+     * @param sysLogininfor
+     * @param request
+     */
+    public void saveLoginLog(SysLogininfor sysLogininfor,HttpServletRequest request){
+        UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
+        //异步添加登录日志
+        ApplicationListener.executorService.submit(() ->{
+            try{
+                sysLogininfor.setIpaddr(IpUtils.getIpAddr(request));
+                sysLogininfor.setLoginLocation(AddressUtils.getRealAddressByIP(IpUtils.getIpAddr(request)));
+                sysLogininfor.setBrowser(userAgent.getBrowser().getName());
+                sysLogininfor.setOs(userAgent.getOperatingSystem().getName());
+                sysLogininforMapper.insertLogininfor(sysLogininfor);
+            }catch (Exception e){
+                //不做处理
+            }
+        });
+    }
+
+    /**
+     * 其他登录
+     * @return
+     */
+    public JsonResult otherLogin(){
+        return JsonResult.error();
+    }
 }

@@ -15,4 +15,6 @@ import org.springframework.stereotype.Component;
 public class TokenKey {
 
     private String pcToken;
+
+    private String appToken;
 }

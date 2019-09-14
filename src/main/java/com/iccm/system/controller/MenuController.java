@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.iccm.common.BaseController;
 import com.iccm.common.JsonResult;
 import com.iccm.common.SysUtils;
+import com.iccm.common.annotation.Log;
 import com.iccm.common.annotation.PermissionsApi;
 import com.iccm.common.annotation.RequiresPermissions;
 import com.iccm.system.model.Menu;
@@ -30,6 +31,7 @@ public class MenuController extends BaseController
     /**
      * 查询菜单列表
      */
+//    @Log(title = "菜单管理",businessType = B)
     @RequiresPermissions(value = "查询菜单列表",authorities = "post:system:menu:list")
     @PostMapping("/list")
     public JsonResult list(@RequestBody Menu menu)

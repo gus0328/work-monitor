@@ -10,15 +10,29 @@ public enum OperatorType
     /**
      * 其它
      */
-    OTHER,
+    OTHER("其他"),
 
     /**
      * 后台用户
      */
-    MANAGE,
+    MANAGE("PC"),
 
     /**
      * 手机端用户
      */
-    MOBILE
+    MOBILE("APP");
+
+    private final String name;
+
+    OperatorType(String name) {
+        this.name = name;
+    }
+
+    OperatorType() {
+        this.name = "";
+    }
+
+    public String getName() {
+        return name;
+    }
 }

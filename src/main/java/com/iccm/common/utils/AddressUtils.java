@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 获取地址类
  * 
- * @author ruoyi
+ * @author gxj
  */
 public class AddressUtils
 {

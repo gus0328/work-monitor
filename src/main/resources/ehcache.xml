@@ -13,4 +13,7 @@
 	<cache name="pcTokens" maxElementsInMemory="3000000"
 		   maxElementsOnDisk="0" eternal="true" overflowToDisk="false"
 		   diskSpoolBufferSizeMB="200000" memoryStoreEvictionPolicy="LFU" />
+	<cache name="appTokens" maxElementsInMemory="3000000"
+		   maxElementsOnDisk="0" eternal="true" overflowToDisk="false"
+		   diskSpoolBufferSizeMB="200000" memoryStoreEvictionPolicy="LFU" />
 </ehcache>

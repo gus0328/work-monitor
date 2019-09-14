@@ -14,4 +14,9 @@ public class CacheName {
      * pc token
      */
     public static final String PCTOKENS = "pcTokens";
+
+    /**
+     * app token
+     */
+    public static final String APPTOKENS = "appTokens";
 }

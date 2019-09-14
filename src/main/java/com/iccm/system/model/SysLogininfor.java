@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * 系统访问记录表 sys_logininfor
  * 
- * @author ruoyi
+ * @author gxj
  */
 @Data
 public class SysLogininfor extends BaseEntity
@@ -51,5 +51,10 @@ public class SysLogininfor extends BaseEntity
     /** 访问时间 */
     @Excel(name = "访问时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date loginTime;
+
+    /**
+     * 登录来源
+     */
+    private String loginSource;
 
 }

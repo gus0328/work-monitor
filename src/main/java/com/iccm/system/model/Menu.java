@@ -8,7 +8,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 /**
  * 菜单对象 menu
  *
- * @author ruoyi
+ * @author gxj
  * @date 2019-09-07
  */
 @Data

@@ -7,6 +7,7 @@ import com.iccm.common.SysUtils;
 import com.iccm.common.annotation.Log;
 import com.iccm.common.config.ApplicationListener;
 import com.iccm.common.enums.BusinessStatus;
+import com.iccm.common.enums.OperatorType;
 import com.iccm.common.utils.StringUtils;
 import com.iccm.system.mapper.SysOperLogMapper;
 import com.iccm.system.model.SysOperLog;
@@ -23,13 +24,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
  * 操作日志记录处理
  * 
- * @author ruoyi
+ * @author gxj
  */
 @Aspect
 @Component
@@ -39,6 +41,9 @@ public class LogAspect
 
     @Autowired
     private SysOperLogMapper sysOperLogMapper;
+
+    @Autowired
+    private HttpServletRequest request;
 
     // 配置织入点
     @Pointcut("@annotation(com.iccm.common.annotation.Log)")
@@ -137,11 +142,12 @@ public class LogAspect
     public void getControllerMethodDescription(Log log, SysOperLog operLog) throws Exception
     {
         // 设置action动作
-        operLog.setBusinessType(log.businessType().ordinal());
+        operLog.setBusinessType(log.businessType().getName());
         // 设置标题
         operLog.setTitle(log.title());
         // 设置操作人类别
-        operLog.setOperatorType(log.operatorType().ordinal());
+        OperatorType operatorType = (OperatorType) request.getAttribute("source");
+        operLog.setOperatorType(operatorType.getName());
         // 是否需要保存request，参数和值
         if (log.isSaveRequestData())
         {
