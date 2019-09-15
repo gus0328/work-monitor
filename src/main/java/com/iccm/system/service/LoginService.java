@@ -56,15 +56,15 @@ public class LoginService {
     public JsonResult login(LoginParams loginParams, HttpSession session, HttpServletRequest request) {
         JsonResult jsonResult = null;
         if(!session.getAttribute(Constants.KAPTCHA_SESSION_KEY).equals(loginParams.getValidateCode())){
-            jsonResult = JsonResult.error("验证码错误");
+            jsonResult = JsonResult.ok(-1,"验证码错误");
         }
         SysUser user = sysUserService.selectUserByLoginName(loginParams.getUsername());
-        if (user == null) {
-            jsonResult = JsonResult.error("账号不存在");
-        } else if (!user.getPassword().equals(EndecryptUtils.encrytMd5(loginParams.getPassword()))) {
-            jsonResult = JsonResult.error("密码错误");
-        } else if ("1".equals(user.getStatus())) {
-            jsonResult = JsonResult.error("账号被锁定");
+        if (jsonResult==null&&user == null) {
+            jsonResult = JsonResult.ok(-1,"账号不存在");
+        } else if (jsonResult==null&&!user.getPassword().equals(EndecryptUtils.encrytMd5(loginParams.getPassword()))) {
+            jsonResult = JsonResult.ok(-1,"密码错误");
+        } else if (jsonResult==null&&"1".equals(user.getStatus())) {
+            jsonResult = JsonResult.ok(-1,"账号被锁定");
         }
         SysLogininfor sysLogininfor = new SysLogininfor();
         sysLogininfor.setLoginName(loginParams.getUsername());
@@ -76,8 +76,6 @@ public class LoginService {
             sysLogininfor.setStatus("0");
             sysLogininfor.setMsg("登录成功");
         }
-        user.setLoginIp(sysLogininfor.getIpaddr());
-        user.setLoginDate(sysLogininfor.getLoginTime());
         String type = request.getHeader("request_source");
         if("PC".equals(type)){
             //保存日志
@@ -86,6 +84,8 @@ public class LoginService {
             if(jsonResult!=null){
                 return jsonResult;
             }
+            user.setLoginIp(sysLogininfor.getIpaddr());
+            user.setLoginDate(sysLogininfor.getLoginTime());
             return pcLogin(loginParams,session,user);
         }else if("APP".equals(type)){
             sysLogininfor.setLoginSource(OperatorType.MOBILE.getName());
@@ -93,6 +93,8 @@ public class LoginService {
             if(jsonResult!=null){
                 return jsonResult;
             }
+            user.setLoginIp(sysLogininfor.getIpaddr());
+            user.setLoginDate(sysLogininfor.getLoginTime());
             return appLogin(user,sysLogininfor.getLoginTime());
         }else if("OTHER".equals(type)){
             sysLogininfor.setLoginSource(OperatorType.OTHER.getName());
@@ -156,19 +158,20 @@ public class LoginService {
      * @param request
      */
     public void saveLoginLog(SysLogininfor sysLogininfor,HttpServletRequest request){
-        UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
-        //异步添加登录日志
-        ApplicationListener.executorService.submit(() ->{
-            try{
-                sysLogininfor.setIpaddr(IpUtils.getIpAddr(request));
-                sysLogininfor.setLoginLocation(AddressUtils.getRealAddressByIP(IpUtils.getIpAddr(request)));
+        try{
+            UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
+            String ip = IpUtils.getIpAddr(request);
+            sysLogininfor.setIpaddr(ip);
+            //异步添加登录日志
+            ApplicationListener.executorService.submit(() ->{
+                sysLogininfor.setLoginLocation(AddressUtils.getRealAddressByIP(ip));
                 sysLogininfor.setBrowser(userAgent.getBrowser().getName());
                 sysLogininfor.setOs(userAgent.getOperatingSystem().getName());
                 sysLogininforMapper.insertLogininfor(sysLogininfor);
-            }catch (Exception e){
-                //不做处理
-            }
-        });
+            });
+        }catch (Exception e){
+            //不做处理
+        }
     }
 
     /**

@@ -26,7 +26,7 @@ import java.util.List;
  */
 @Aspect
 @Component
-@Order(1)
+@Order(0)
 public class PermissionsAspect {
 
     private static final String point = "execution(* com.iccm.system.controller..*(..))";

@@ -7,6 +7,7 @@ import com.iccm.common.SysUtils;
 import com.iccm.common.annotation.Log;
 import com.iccm.common.annotation.PermissionsApi;
 import com.iccm.common.annotation.RequiresPermissions;
+import com.iccm.common.enums.BusinessType;
 import com.iccm.system.model.Menu;
 import com.iccm.system.model.PostModel;
 import com.iccm.system.service.IMenuService;
@@ -31,7 +32,7 @@ public class MenuController extends BaseController
     /**
      * 查询菜单列表
      */
-//    @Log(title = "菜单管理",businessType = B)
+    @Log(title = "菜单管理",businessType = BusinessType.QUERY)
     @RequiresPermissions(value = "查询菜单列表",authorities = "post:system:menu:list")
     @PostMapping("/list")
     public JsonResult list(@RequestBody Menu menu)
