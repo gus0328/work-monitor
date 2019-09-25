@@ -5,7 +5,7 @@ package com.iccm.common.websocket;
  */
 public enum SystemNoticeType {
 
-    /*登录超时*/LineOutTime("lineOutTime"),/*被踢下线*/KickOffTheLine("kickOffTheLine");
+    /*登录超时*/LineOutTime("lineOutTime"),/*被踢下线*/KickOffTheLine("kickOffTheLine"),ContractExpiry("contractExpiry");
     private final String type;
 
     private SystemNoticeType(String type)

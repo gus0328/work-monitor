@@ -36,7 +36,7 @@ public class MyWebMvcConfigurer implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(loggerInterceptor()).addPathPatterns("/**").excludePathPatterns("/login/*").excludePathPatterns("/captcha/captchaImage");
+        registry.addInterceptor(loggerInterceptor()).addPathPatterns("/**").excludePathPatterns("/login/*").excludePathPatterns("/captcha/captchaImage").excludePathPatterns("/upload/*");
     }
 
     /**

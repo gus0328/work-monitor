@@ -19,4 +19,9 @@ public class CacheName {
      * app token
      */
     public static final String APPTOKENS = "appTokens";
+
+    /**
+     * siteWorkId
+     */
+    public static final String SITEWORKID = "siteWorkId";
 }

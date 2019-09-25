@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iccm.system.mapper.SiteWorkerMapper">
+    
+    <resultMap type="SiteWorker" id="SiteWorkerResult">
+        <result property="id"    column="id"    />
+        <result property="personName"    column="person_name"    />
+        <result property="mobileNum"    column="mobile_num"    />
+        <result property="workId"    column="work_id"    />
+        <result property="wearDeviceId"    column="wear_device_id"    />
+        <result property="itemCode"    column="item_code"    />
+        <result property="itemName"    column="item_name"    />
+        <result property="orderNum"    column="order_num"    />
+    </resultMap>
+
+    <resultMap type="SiteWorkerVo" id="SiteWorkerVoResult">
+        <result property="personName"    column="person_name"    />
+        <result property="mobileNum"    column="mobile_num"    />
+        <result property="workId"    column="work_id"    />
+    </resultMap>
+
+    <resultMap type="com.iccm.system.model.SiteWorkerVo$WearDevice" id="SiteWorkerVoDeviceResult">
+        <result property="wearDeviceId"    column="wear_device_id"    />
+        <result property="itemCode"    column="item_code"    />
+        <result property="itemName"    column="item_name"    />
+        <result property="orderNum"    column="order_num"    />
+    </resultMap>
+
+    <select id="getDeviceList" parameterType="Object" resultMap="SiteWorkerVoDeviceResult">
+        SELECT
+            wear_device_id,
+            item_code,
+            item_name,
+            order_num
+        FROM
+            site_worker
+        WHERE
+            person_name = #{personName}
+        AND mobile_num = #{mobileNum}
+        AND work_id = #{workId}
+    </select>
+
+    <select id="getWorkerListByWorkId" parameterType="Object" resultMap="SiteWorkerVoResult">
+        SELECT
+            person_name,
+            mobile_num,
+            work_id
+        FROM
+            site_worker
+        where
+            work_id = #{workId}
+        GROUP BY person_name,
+            mobile_num,
+            work_id,
+            order_num
+        ORDER BY order_num
+    </select>
+
+    <sql id="selectSiteWorkerVo">
+        select id, person_name, mobile_num, work_id, wear_device_id, item_code, item_name, order_num from site_worker
+    </sql>
+
+    <select id="selectSiteWorkerList" parameterType="SiteWorker" resultMap="SiteWorkerResult">
+        <include refid="selectSiteWorkerVo"/>
+        <where>  
+            <if test="personName != null  and personName != ''"> and person_name like concat('%', #{personName}, '%')</if>
+            <if test="mobileNum != null  and mobileNum != ''"> and mobile_num = #{mobileNum}</if>
+            <if test="workId != null  and workId != ''"> and work_id = #{workId}</if>
+            <if test="wearDeviceId != null "> and wear_device_id = #{wearDeviceId}</if>
+            <if test="itemCode != null  and itemCode != ''"> and item_code = #{itemCode}</if>
+            <if test="itemName != null  and itemName != ''"> and item_name like concat('%', #{itemName}, '%')</if>
+            <if test="orderNum != null "> and order_num = #{orderNum}</if>
+        </where>
+    </select>
+    
+    <select id="selectSiteWorkerById" parameterType="Long" resultMap="SiteWorkerResult">
+        <include refid="selectSiteWorkerVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSiteWorker" parameterType="SiteWorker" useGeneratedKeys="true" keyProperty="id">
+        insert into site_worker
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="personName != null  and personName != ''">person_name,</if>
+            <if test="mobileNum != null  and mobileNum != ''">mobile_num,</if>
+            <if test="workId != null  and workId != ''">work_id,</if>
+            <if test="wearDeviceId != null ">wear_device_id,</if>
+            <if test="itemCode != null  and itemCode != ''">item_code,</if>
+            <if test="itemName != null  and itemName != ''">item_name,</if>
+            <if test="orderNum != null ">order_num,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="personName != null  and personName != ''">#{personName},</if>
+            <if test="mobileNum != null  and mobileNum != ''">#{mobileNum},</if>
+            <if test="workId != null  and workId != ''">#{workId},</if>
+            <if test="wearDeviceId != null ">#{wearDeviceId},</if>
+            <if test="itemCode != null  and itemCode != ''">#{itemCode},</if>
+            <if test="itemName != null  and itemName != ''">#{itemName},</if>
+            <if test="orderNum != null ">#{orderNum},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSiteWorker" parameterType="SiteWorker">
+        update site_worker
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="personName != null  and personName != ''">person_name = #{personName},</if>
+            <if test="mobileNum != null  and mobileNum != ''">mobile_num = #{mobileNum},</if>
+            <if test="workId != null  and workId != ''">work_id = #{workId},</if>
+            <if test="wearDeviceId != null ">wear_device_id = #{wearDeviceId},</if>
+            <if test="itemCode != null  and itemCode != ''">item_code = #{itemCode},</if>
+            <if test="itemName != null  and itemName != ''">item_name = #{itemName},</if>
+            <if test="orderNum != null ">order_num = #{orderNum},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSiteWorkerById" parameterType="Long">
+        delete from site_worker where id = #{id}
+    </delete>
+
+    <delete id="deleteSiteWorkerByIds" parameterType="String">
+        delete from site_worker where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteSiteWorkerByWorkId" parameterType="Object">
+        delete from site_worker where work_id = #{workId}
+    </delete>
+    
+</mapper>

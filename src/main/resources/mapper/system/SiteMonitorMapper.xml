@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iccm.system.mapper.SiteMonitorMapper">
+    
+    <resultMap type="SiteMonitor" id="SiteMonitorResult">
+        <result property="id"    column="id"    />
+        <result property="itemCode"    column="item_code"    />
+        <result property="itemName"    column="item_name"    />
+        <result property="ipAdress"    column="ip_adress"    />
+        <result property="workId"    column="work_id"    />
+        <result property="monitorDeviceId"    column="monitor_device_id"    />
+        <result property="orderNum"    column="order_num"    />
+    </resultMap>
+
+    <sql id="selectSiteMonitorVo">
+        select id, item_code, item_name, ip_adress, work_id, monitor_device_id, order_num from site_monitor
+    </sql>
+
+    <select id="selectSiteMonitorList" parameterType="SiteMonitor" resultMap="SiteMonitorResult">
+        <include refid="selectSiteMonitorVo"/>
+        <where>  
+            <if test="itemCode != null  and itemCode != ''"> and item_code = #{itemCode}</if>
+            <if test="itemName != null  and itemName != ''"> and item_name like concat('%', #{itemName}, '%')</if>
+            <if test="ipAdress != null  and ipAdress != ''"> and ip_adress = #{ipAdress}</if>
+            <if test="workId != null  and workId != ''"> and work_id = #{workId}</if>
+            <if test="monitorDeviceId != null "> and monitor_device_id = #{monitorDeviceId}</if>
+            <if test="orderNum != null "> and order_num = #{orderNum}</if>
+        </where>
+    </select>
+
+    <select id="getMonitorsByWorkId" parameterType="Object" resultMap="SiteMonitorResult">
+        <include refid="selectSiteMonitorVo"/>
+        WHERE work_id = #{workId}
+    </select>
+    
+    <select id="selectSiteMonitorById" parameterType="Long" resultMap="SiteMonitorResult">
+        <include refid="selectSiteMonitorVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSiteMonitor" parameterType="SiteMonitor" useGeneratedKeys="true" keyProperty="id">
+        insert into site_monitor
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="itemCode != null  and itemCode != ''">item_code,</if>
+            <if test="itemName != null  and itemName != ''">item_name,</if>
+            <if test="ipAdress != null  and ipAdress != ''">ip_adress,</if>
+            <if test="workId != null  and workId != ''">work_id,</if>
+            <if test="monitorDeviceId != null ">monitor_device_id,</if>
+            <if test="orderNum != null ">order_num,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="itemCode != null  and itemCode != ''">#{itemCode},</if>
+            <if test="itemName != null  and itemName != ''">#{itemName},</if>
+            <if test="ipAdress != null  and ipAdress != ''">#{ipAdress},</if>
+            <if test="workId != null  and workId != ''">#{workId},</if>
+            <if test="monitorDeviceId != null ">#{monitorDeviceId},</if>
+            <if test="orderNum != null ">#{orderNum},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSiteMonitor" parameterType="SiteMonitor">
+        update site_monitor
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="itemCode != null  and itemCode != ''">item_code = #{itemCode},</if>
+            <if test="itemName != null  and itemName != ''">item_name = #{itemName},</if>
+            <if test="ipAdress != null  and ipAdress != ''">ip_adress = #{ipAdress},</if>
+            <if test="workId != null  and workId != ''">work_id = #{workId},</if>
+            <if test="monitorDeviceId != null ">monitor_device_id = #{monitorDeviceId},</if>
+            <if test="orderNum != null ">order_num = #{orderNum},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSiteMonitorById" parameterType="Long">
+        delete from site_monitor where id = #{id}
+    </delete>
+
+    <delete id="deleteSiteMonitorByIds" parameterType="String">
+        delete from site_monitor where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteSiteMonitorByWorkId" parameterType="Object">
+        delete from site_monitor where work_id = #{workId}
+    </delete>
+    
+</mapper>

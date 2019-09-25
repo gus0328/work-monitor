@@ -2,6 +2,9 @@ package com.iccm.system.controller;
 
 import com.iccm.common.BaseController;
 import com.iccm.common.ExcelUtil;
+import com.iccm.common.JsonResult;
+import com.iccm.common.annotation.Log;
+import com.iccm.common.annotation.PermissionsApi;
 import com.iccm.common.annotation.RequiresPermissions;
 import com.iccm.common.enums.BusinessType;
 import com.iccm.common.page.TableDataInfo;
@@ -19,30 +22,24 @@ import java.util.List;
  * 
  * @author gxj
  */
-@Controller
+@PermissionsApi(value = "操作日志",authorities = "monitor:operlog")
+@RestController
 @RequestMapping("/monitor/operlog")
 public class SysOperlogController extends BaseController
 {
-    private String prefix = "monitor/operlog";
 
     @Autowired
     private ISysOperLogService operLogService;
 
-    @RequiresPermissions("monitor:operlog:view")
-    @GetMapping()
-    public String operlog()
-    {
-        return prefix + "/operlog";
-    }
-
-    @RequiresPermissions("monitor:operlog:list")
+    @Log(title = "操作日志",businessType = BusinessType.QUERY)
+    @RequiresPermissions(value = "查询操作日志",authorities = "post:monitor:operlog:list")
     @PostMapping("/list")
-    @ResponseBody
-    public TableDataInfo list(SysOperLog operLog)
+    public JsonResult list(@RequestBody SysOperLog operLog)
     {
         startPage();
         List<SysOperLog> list = operLogService.selectOperLogList(operLog);
-        return getDataTable(list);
+        TableDataInfo tableDataInfo = getDataTable(list);
+        return JsonResult.ok().put("data",tableDataInfo);
     }
 
 //    @Log(title = "操作日志", businessType = BusinessType.EXPORT)

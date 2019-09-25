@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iccm.system.mapper.UserMessageMapper">
+    
+    <resultMap type="UserMessage" id="UserMessageResult">
+        <result property="messageId"    column="message_id"    />
+        <result property="userId"    column="user_id"    />
+    </resultMap>
+
+    <sql id="selectUserMessageVo">
+        select message_id, user_id from user_message
+    </sql>
+
+    <select id="selectUserMessageList" parameterType="UserMessage" resultMap="UserMessageResult">
+        <include refid="selectUserMessageVo"/>
+        <where>  
+            <if test="userId != null "> and user_id = #{userId}</if>
+        </where>
+    </select>
+    
+    <select id="selectUserMessageById" parameterType="Long" resultMap="UserMessageResult">
+        <include refid="selectUserMessageVo"/>
+        where message_id = #{messageId}
+    </select>
+        
+    <insert id="insertUserMessage" parameterType="UserMessage">
+        insert into user_message
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="messageId != null ">message_id,</if>
+            <if test="userId != null ">user_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="messageId != null ">#{messageId},</if>
+            <if test="userId != null ">#{userId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateUserMessage" parameterType="UserMessage">
+        update user_message
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null ">user_id = #{userId},</if>
+        </trim>
+        where message_id = #{messageId}
+    </update>
+
+    <delete id="deleteUserMessageById" parameterType="Long">
+        delete from user_message where message_id = #{messageId}
+    </delete>
+
+    <delete id="deleteUserMessageByIds" parameterType="String">
+        delete from user_message where message_id in 
+        <foreach item="messageId" collection="array" open="(" separator="," close=")">
+            #{messageId}
+        </foreach>
+    </delete>
+    
+</mapper>

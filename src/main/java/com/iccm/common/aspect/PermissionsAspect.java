@@ -1,5 +1,7 @@
 package com.iccm.common.aspect;
 
+import com.alibaba.fastjson.JSONObject;
+import com.iccm.common.Constants;
 import com.iccm.common.SysUtils;
 import com.iccm.common.annotation.RequiresPermissions;
 import com.iccm.common.exception.PermissionsException;
@@ -18,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.List;
 
 /**
@@ -37,6 +41,9 @@ public class PermissionsAspect {
     @Autowired
     private SysUserRoleMapper sysUserRoleMapper;
 
+    @Autowired
+    private HttpServletRequest request;
+
     //切点
     @Pointcut(value = point)
     public void point() {
@@ -47,6 +54,14 @@ public class PermissionsAspect {
     public void before(JoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
+        Object[] objects = joinPoint.getArgs();
+        String params = "{}";
+        try{
+            params =JSONObject.toJSONString(objects);
+        }catch (Exception e){
+            //不做处理
+        }
+        request.setAttribute(Constants.REQUEST_DATA,params);//操作日志管理用
         RequiresPermissions requiresPermissions = method.getAnnotation(RequiresPermissions.class);
         if (requiresPermissions != null) {
             if(!verifyUserPermissions(requiresPermissions.authorities())){

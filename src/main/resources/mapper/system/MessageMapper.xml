@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iccm.system.mapper.MessageMapper">
+
+    <resultMap type="Message" id="MessageResult">
+        <result property="id"    column="id"    />
+        <result property="title"    column="title"    />
+        <result property="message"    column="message"    />
+        <result property="sendUser"    column="send_user"    />
+        <result property="sendTime"    column="send_time"    />
+        <result property="messageType"    column="message_type"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectMessageVo">
+        select id, title, message, send_user, send_time, message_type, status from message
+    </sql>
+
+    <select id="queryListByStatus" parameterType="Object" resultMap="MessageResult">
+    SELECT
+        id,
+        title,
+        send_time,
+        send_user,
+        status
+    FROM
+        message
+    WHERE
+        STATUS in(0,1)
+    AND id IN (
+        SELECT
+            message_id
+        FROM
+            user_message
+        WHERE
+            user_id = #{userId}
+    )
+    </select>
+
+    <select id="queryDelListByStatus" parameterType="Object" resultMap="MessageResult">
+         SELECT
+        id,
+        title,
+        send_time,
+        send_user,
+        status
+    FROM
+        message
+    WHERE
+        STATUS = 2
+    AND id IN (
+        SELECT
+            message_id
+        FROM
+            user_message
+        WHERE
+            user_id = #{userId}
+    )
+    </select>
+
+    <select id="queryUnreadCount" parameterType="Object" resultType="int">
+      SELECT
+       count(*)
+    FROM
+        message
+    WHERE
+        STATUS = 0
+    AND id IN (
+        SELECT
+            message_id
+        FROM
+            user_message
+        WHERE
+            user_id = #{userId}
+    )
+    </select>
+
+    <select id="queryReadCount" parameterType="Object" resultType="int">
+      SELECT
+       count(*)
+    FROM
+        message
+    WHERE
+        STATUS = 1
+    AND id IN (
+        SELECT
+            message_id
+        FROM
+            user_message
+        WHERE
+            user_id = #{userId}
+    )
+    </select>
+
+    <select id="selectMessageList" parameterType="Message" resultMap="MessageResult">
+        <include refid="selectMessageVo"/>
+        <where>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="message != null  and message != ''"> and message = #{message}</if>
+            <if test="sendUser != null  and sendUser != ''"> and send_user = #{sendUser}</if>
+            <if test="sendTime != null "> and send_time = #{sendTime}</if>
+            <if test="messageType != null  and messageType != ''"> and message_type = #{messageType}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="selectMessageById" parameterType="String" resultMap="MessageResult">
+        <include refid="selectMessageVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMessage" parameterType="Message" useGeneratedKeys="true" keyProperty="id">
+        insert into message
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            id,
+            <if test="title != null  and title != ''">title,</if>
+            <if test="message != null  and message != ''">message,</if>
+            <if test="sendUser != null  and sendUser != ''">send_user,</if>
+            <if test="sendTime != null ">send_time,</if>
+            <if test="messageType != null  and messageType != ''">message_type,</if>
+            <if test="status != null ">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{id},
+            <if test="title != null  and title != ''">#{title},</if>
+            <if test="message != null  and message != ''">#{message},</if>
+            <if test="sendUser != null  and sendUser != ''">#{sendUser},</if>
+            <if test="sendTime != null ">#{sendTime},</if>
+            <if test="messageType != null  and messageType != ''">#{messageType},</if>
+            <if test="status != null ">#{status},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMessage" parameterType="Message">
+        update message
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null  and title != ''">title = #{title},</if>
+            <if test="message != null  and message != ''">message = #{message},</if>
+            <if test="sendUser != null  and sendUser != ''">send_user = #{sendUser},</if>
+            <if test="sendTime != null ">send_time = #{sendTime},</if>
+            <if test="messageType != null  and messageType != ''">message_type = #{messageType},</if>
+            <if test="status != null ">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMessageById" parameterType="Integer">
+        delete from message where id = #{id}
+    </delete>
+
+    <delete id="deleteMessageByIds" parameterType="String">
+        delete from message where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

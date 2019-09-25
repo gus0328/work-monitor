@@ -3,6 +3,9 @@ package com.iccm.system.controller;
 
 import com.iccm.common.BaseController;
 import com.iccm.common.ExcelUtil;
+import com.iccm.common.JsonResult;
+import com.iccm.common.annotation.Log;
+import com.iccm.common.annotation.PermissionsApi;
 import com.iccm.common.annotation.RequiresPermissions;
 import com.iccm.common.enums.BusinessType;
 import com.iccm.common.page.TableDataInfo;
@@ -10,42 +13,31 @@ import com.iccm.system.model.SysLogininfor;
 import com.iccm.system.service.ISysLogininforService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
  * 系统访问记录
- * 
+ *
  * @author gxj
  */
-@Controller
+@PermissionsApi(value = "登录日志",authorities = "monitor:logininfor")
+@RestController
 @RequestMapping("/monitor/logininfor")
-public class SysLogininforController extends BaseController
-{
-    private String prefix = "monitor/logininfor";
+public class SysLogininforController extends BaseController {
 
     @Autowired
     private ISysLogininforService logininforService;
 
-    @RequiresPermissions("monitor:logininfor:view")
-    @GetMapping()
-    public String logininfor()
-    {
-        return prefix + "/logininfor";
-    }
-
-    @RequiresPermissions("monitor:logininfor:list")
+    @Log(title = "登录日志",businessType = BusinessType.QUERY)
+    @RequiresPermissions(value = "查询登录日志",authorities = "post:monitor:logininfor:list")
     @PostMapping("/list")
-    @ResponseBody
-    public TableDataInfo list(SysLogininfor logininfor)
-    {
+    public JsonResult list(@RequestBody SysLogininfor logininfor) {
         startPage();
         List<SysLogininfor> list = logininforService.selectLogininforList(logininfor);
-        return getDataTable(list);
+        TableDataInfo tableDataInfo = getDataTable(list);
+        return JsonResult.ok().put("data",tableDataInfo);
     }
 
 //    @Log(title = "登陆日志", businessType = BusinessType.EXPORT)

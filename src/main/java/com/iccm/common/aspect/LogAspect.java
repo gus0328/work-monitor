@@ -3,6 +3,7 @@ package com.iccm.common.aspect;
 
 import com.alibaba.fastjson.JSON;
 import com.iccm.common.CacheName;
+import com.iccm.common.Constants;
 import com.iccm.common.ServletUtils;
 import com.iccm.common.SysUtils;
 import com.iccm.common.annotation.Log;
@@ -100,9 +101,10 @@ public class LogAspect
             }
             String operUrl = request.getRequestURI();
             String method = request.getMethod();
-            Map map = request.getParameterMap();
+//            Map map = request.getParameterMap();
             String ip = IpUtils.getIpAddr(request);
             String location = AddressUtils.getRealAddressByIP(ip);
+            String params = (String)request.getAttribute(Constants.REQUEST_DATA);
             ApplicationListener.executorService.submit(() -> {
                 try
                 {
@@ -143,7 +145,7 @@ public class LogAspect
                     // 设置请求方式
                     operLog.setRequestMethod(method);
                     // 处理设置注解上的参数
-                    getControllerMethodDescription(controllerLog, operLog,operatorType,map);
+                    getControllerMethodDescription(controllerLog, operLog,operatorType,params);
                     // 保存数据库
                     sysOperLogMapper.insertOperlog(operLog);
                 }
@@ -171,7 +173,7 @@ public class LogAspect
      * @param operLog 操作日志
      * @throws Exception
      */
-    public void getControllerMethodDescription(Log log, SysOperLog operLog,OperatorType operatorType,Map map) throws Exception
+    public void getControllerMethodDescription(Log log, SysOperLog operLog,OperatorType operatorType,String params) throws Exception
     {
         // 设置action动作
         operLog.setBusinessType(log.businessType().getName());
@@ -183,7 +185,8 @@ public class LogAspect
         if (log.isSaveRequestData())
         {
             // 获取参数的信息，传入到数据库中。
-            setRequestValue(operLog,map);
+//            setRequestValue(operLog,map);
+            operLog.setOperParam(params);
         }
     }
 

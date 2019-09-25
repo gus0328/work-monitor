@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iccm.system.mapper.ContractMapper">
+    
+    <resultMap type="Contract" id="ContractResult">
+        <result property="id"    column="id"    />
+        <result property="contractNo"    column="contract_no"    />
+        <result property="contractDate"    column="contract_date"    />
+        <result property="expiryDate"    column="expiry_date"    />
+        <result property="warnName"    column="warn_name"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectContractVo">
+        select id, contract_no, contract_date, expiry_date, warn_name, create_by, create_time, status from contract
+    </sql>
+
+    <select id="selectContractList" parameterType="Contract" resultMap="ContractResult">
+        <include refid="selectContractVo"/>
+        <where>  
+            <if test="contractNo != null  and contractNo != ''"> and contract_no = #{contractNo}</if>
+            <if test="contractDate != null  and contractDate != ''"> and contract_date = #{contractDate}</if>
+            <if test="expiryDate != null  and expiryDate != ''"> and expiry_date = #{expiryDate}</if>
+            <if test="warnName != null  and warnName != ''"> and warn_name like concat('%', #{warnName}, '%')</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectContractById" parameterType="Integer" resultMap="ContractResult">
+        <include refid="selectContractVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectExpiryContract" parameterType="Object" resultMap="ContractResult">
+        <include refid="selectContractVo"/>
+        where date_format(sysdate(),'%y%m%d%T') &gt;= date_format(expiry_date,'%y%m%d%T')
+        and status = 0
+    </select>
+        
+    <insert id="insertContract" parameterType="Contract" useGeneratedKeys="true" keyProperty="id">
+        insert into contract
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="contractNo != null  and contractNo != ''">contract_no,</if>
+            <if test="contractDate != null  and contractDate != ''">contract_date,</if>
+            <if test="expiryDate != null  and expiryDate != ''">expiry_date,</if>
+            <if test="warnName != null  and warnName != ''">warn_name,</if>
+            <if test="createBy != null  and createBy != ''">create_by,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="status != null ">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="contractNo != null  and contractNo != ''">#{contractNo},</if>
+            <if test="contractDate != null  and contractDate != ''">#{contractDate},</if>
+            <if test="expiryDate != null  and expiryDate != ''">#{expiryDate},</if>
+            <if test="warnName != null  and warnName != ''">#{warnName},</if>
+            <if test="createBy != null  and createBy != ''">#{createBy},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="status != null ">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updateContract" parameterType="Contract">
+        update contract
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="contractNo != null  and contractNo != ''">contract_no = #{contractNo},</if>
+            <if test="contractDate != null  and contractDate != ''">contract_date = #{contractDate},</if>
+            <if test="expiryDate != null  and expiryDate != ''">expiry_date = #{expiryDate},</if>
+            <if test="warnName != null  and warnName != ''">warn_name = #{warnName},</if>
+            <if test="createBy != null  and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="status != null ">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteContractById" parameterType="Integer">
+        delete from contract where id = #{id}
+    </delete>
+
+    <delete id="deleteContractByIds" parameterType="String">
+        delete from contract where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

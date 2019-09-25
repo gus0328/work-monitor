@@ -67,4 +67,19 @@ public class Constants
      */
     public static final String SYS_AUTH_API = "API";
 
+    /**
+     * 日志用data 值
+     */
+    public static final String REQUEST_DATA="request_data";
+
+    /**
+     * 系统通知
+     */
+    public static final String SYS_NOTICE="系统通知";
+
+    /**
+     * 合同超期提醒
+     */
+    public static final String CONTRACT_WARN="合同超期提醒";
+
 }

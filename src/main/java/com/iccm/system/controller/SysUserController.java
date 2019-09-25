@@ -65,6 +65,22 @@ public class SysUserController extends BaseController
     }
 
     /**
+     * 查询用户组件查询用户
+     * @param user
+     * @return
+     */
+    @PostMapping("/chooseUser")
+    public JsonResult chooseUser(@RequestBody SysUser user){
+        List<SysUser> list = userService.selectUserList(user);
+        list.forEach(sysUser -> {
+            userService.setPostInfo(sysUser);
+            userService.setRoleInfo(sysUser);
+            sysUser.setRpassword(sysUser.getPassword());
+        });
+        return JsonResult.ok().put("data",list);
+    }
+
+    /**
      * 导出用户数据
      * @param user
      * @return
