@@ -24,11 +24,7 @@ public class SysUtils {
     public static SysUser getSysUser(){
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         SysUser  user=(SysUser) request.getSession().getAttribute("user");
-//        if(user==null) {
-//            String userId = request.getParameter("userId");
-//            SysUserMapper<SysUser> sysUserMapper = SpringUtil.getBean(SysUserMapper.class);
-//            user = sysUserMapper.queryById(userId);
-//        }
-        return user;
+        SysUserMapper sysUserMapper = SpringContextHolder.getBean("sysUserMapper");
+        return sysUserMapper.selectUserById(user.getUserId());
     }
 }

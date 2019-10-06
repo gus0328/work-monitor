@@ -95,11 +95,11 @@ public class LoginInterceptor implements HandlerInterceptor {
 	 * @return
 	 */
 	public boolean appHandle(HttpServletRequest request, HttpServletResponse response, Object arg2){
-		AppTokenInfo appTokenInfo = (AppTokenInfo) cacheManager.getCache(CacheName.APPTOKENS).get(request.getHeader("token"));
+		AppTokenInfo appTokenInfo = cacheManager.getCache(CacheName.APPTOKENS).get(request.getHeader("token"),AppTokenInfo.class);
 		if(appTokenInfo==null){
-			throw new LoginException(401,"用户未登录");
+			throw new LoginException(466,"需要重新登录");
 		}else{
-			if(new Date().getTime()-appTokenInfo.getTime()-systemProperties.getAppTokenTime()>0){
+			if(new Date().getTime()/1000-appTokenInfo.getTime()-systemProperties.getAppTokenTime()>0){
 				throw new LoginException(466,"登录超时");
 			}
 		}

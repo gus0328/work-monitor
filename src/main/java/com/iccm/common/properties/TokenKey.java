@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  */
 @ConfigurationProperties(prefix = "iccm.token")
 @Component("tokenKey")
-@PropertySource("application-${iccm_env}.properties")
+@PropertySource("classpath:application-${iccm_env}.properties")
 @Data
 public class TokenKey {
 

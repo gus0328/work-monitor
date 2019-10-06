@@ -1,18 +1,19 @@
 package com.iccm.system.controller;
 
+import com.iccm.common.FileUtil;
 import com.iccm.common.JsonResult;
 import com.iccm.common.SysUtils;
+import com.iccm.common.properties.SystemProperties;
 import com.iccm.common.utils.ExcelTool;
 import com.iccm.common.utils.ImportSheetData;
 import com.iccm.common.utils.StringUtil;
+import com.iccm.common.utils.UUIDUtil;
 import com.iccm.system.mapper.ContractMapper;
 import com.iccm.system.model.Contract;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -26,6 +27,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/upload")
 public class UploadController {
+
+    @Autowired
+    private SystemProperties systemProperties;
 
     @Autowired
     private ContractMapper contractMapper;
@@ -56,5 +60,20 @@ public class UploadController {
     public JsonResult query(Contract contract){
         List<Contract> list = contractMapper.selectContractList(contract);
         return JsonResult.ok().put("data",list);
+    }
+
+    //处理文件上传
+    @RequestMapping("/uploadAvator")
+    public JsonResult uploadImg(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+        String contentType = file.getContentType();
+        String fileName = file.getOriginalFilename();  //获取上传文件原名
+        int index = fileName.lastIndexOf(".");
+        String newFileName = UUIDUtil.randomUUID32()+fileName.substring(index,fileName.length());
+        try {
+            FileUtil.uploadFile(file.getBytes(), systemProperties.getAvatorPath()+"/", newFileName);
+        } catch (Exception e) {
+            return JsonResult.error("文件上传失败");
+        }
+        return JsonResult.ok();
     }
 }

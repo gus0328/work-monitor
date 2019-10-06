@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  */
 @ConfigurationProperties(prefix = "com.iccm")
 @Component
-@PropertySource("system.properties")
+@PropertySource("classpath:system.properties")
 @Data
 public class SystemProperties {
 
@@ -25,4 +25,6 @@ public class SystemProperties {
     private String ipUrl;
 
     private int appTokenTime;
+
+    private String avatorPath;
 }

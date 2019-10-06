@@ -54,8 +54,9 @@ public class LoginService {
 
     @Transactional
     public JsonResult login(LoginParams loginParams, HttpSession session, HttpServletRequest request) {
+        String type = request.getHeader("request_source");
         JsonResult jsonResult = null;
-        if(!session.getAttribute(Constants.KAPTCHA_SESSION_KEY).equals(loginParams.getValidateCode())){
+        if(type.equals("PC")&&!session.getAttribute(Constants.KAPTCHA_SESSION_KEY).equals(loginParams.getValidateCode())){
             jsonResult = JsonResult.ok(-1,"验证码错误");
         }
         SysUser user = sysUserService.selectUserByLoginName(loginParams.getUsername());
@@ -76,7 +77,6 @@ public class LoginService {
             sysLogininfor.setStatus("0");
             sysLogininfor.setMsg("登录成功");
         }
-        String type = request.getHeader("request_source");
         if("PC".equals(type)){
             //保存日志
             sysLogininfor.setLoginSource(OperatorType.MANAGE.getName());

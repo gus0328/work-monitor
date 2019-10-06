@@ -37,6 +37,7 @@
         WHERE
             user_id = #{userId}
     )
+    ORDER BY send_time DESC
     </select>
 
     <select id="queryDelListByStatus" parameterType="Object" resultMap="MessageResult">
