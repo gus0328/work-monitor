@@ -1,7 +1,10 @@
 package com.iccm.common;
 
+import com.iccm.common.enums.OperatorType;
 import com.iccm.system.mapper.SysUserMapper;
+import com.iccm.system.model.AppTokenInfo;
 import com.iccm.system.model.SysUser;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -23,8 +26,19 @@ public class SysUtils {
      */
     public static SysUser getSysUser(){
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        SysUser  user=(SysUser) request.getSession().getAttribute("user");
+        String type = request.getHeader("request_source");
         SysUserMapper sysUserMapper = SpringContextHolder.getBean("sysUserMapper");
-        return sysUserMapper.selectUserById(user.getUserId());
+        Long userId = -1l;
+        if("PC".equals(type)){
+            SysUser  user=(SysUser) request.getSession().getAttribute("user");
+            userId = user.getUserId();
+        }else if("APP".equals(type)){
+            CacheManager cacheManager = SpringContextHolder.getBean("cacheManager");
+            AppTokenInfo appTokenInfo = cacheManager.getCache(CacheName.APPTOKENS).get(request.getHeader("token"),AppTokenInfo.class);
+            userId = appTokenInfo.getSysUser().getUserId();
+        }else if("OTHER".equals(type)){
+            userId = -1L;
+        }
+        return sysUserMapper.selectUserById(userId);
     }
 }

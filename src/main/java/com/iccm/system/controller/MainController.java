@@ -88,4 +88,13 @@ public class MainController {
         return JsonResult.ok().put("data",sysUser).put("token",request.getHeader("token"));
     }
 
+    @PostMapping("/ownspaceInfoSave")
+    public JsonResult ownspaceInfoSave(@RequestParam("userName") String userName,@RequestParam("telephone") String telephone){
+        SysUser sysUser = SysUtils.getSysUser();
+        sysUser.setUserName(userName);
+        sysUser.setPhonenumber(telephone);
+        sysUserMapper.updateUser(sysUser);
+        return JsonResult.ok();
+    }
+
 }

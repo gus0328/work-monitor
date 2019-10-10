@@ -1,5 +1,6 @@
 package com.iccm.system.controller;
 
+import com.iccm.common.CacheName;
 import com.iccm.common.FileUtil;
 import com.iccm.common.JsonResult;
 import com.iccm.common.SysUtils;
@@ -9,13 +10,17 @@ import com.iccm.common.utils.ImportSheetData;
 import com.iccm.common.utils.StringUtil;
 import com.iccm.common.utils.UUIDUtil;
 import com.iccm.system.mapper.ContractMapper;
+import com.iccm.system.mapper.SysUserMapper;
 import com.iccm.system.model.Contract;
+import com.iccm.system.model.SysUser;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +38,12 @@ public class UploadController {
 
     @Autowired
     private ContractMapper contractMapper;
+
+    @Autowired
+    private CacheManager cacheManager;
+
+    @Autowired
+    private SysUserMapper sysUserMapper;
 
     @RequestMapping("/test")
     public JsonResult upload(HttpServletRequest request) throws Exception {
@@ -65,7 +76,6 @@ public class UploadController {
     //处理文件上传
     @RequestMapping("/uploadAvator")
     public JsonResult uploadImg(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
-        String contentType = file.getContentType();
         String fileName = file.getOriginalFilename();  //获取上传文件原名
         int index = fileName.lastIndexOf(".");
         String newFileName = UUIDUtil.randomUUID32()+fileName.substring(index,fileName.length());
@@ -74,6 +84,20 @@ public class UploadController {
         } catch (Exception e) {
             return JsonResult.error("文件上传失败");
         }
-        return JsonResult.ok();
+        String token = request.getParameter("token");
+        String loginName = cacheManager.getCache(CacheName.PCTOKENS).get(token,String.class);
+        SysUser sysUser = sysUserMapper.selectUserByLoginName(loginName);
+        if(StringUtils.isNotBlank(sysUser.getAvatar())){
+            try{
+                File delFile = new File(systemProperties.getAvatorPath()+sysUser.getAvatar().substring(7,sysUser.getAvatar().length()));
+                delFile.delete();
+            }catch (Exception e){
+                //no need deal
+            }
+        }
+        String avatar = "/avator/"+newFileName;
+        sysUser.setAvatar(avatar);
+        sysUserMapper.updateUser(sysUser);
+        return JsonResult.ok().put("data",avatar);
     }
 }
