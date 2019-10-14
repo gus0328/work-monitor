@@ -49,17 +49,19 @@ public class UploadController {
     public JsonResult upload(HttpServletRequest request) throws Exception {
         String[] fields1 = {"contractNo","contractDate","expiryDate","warnName"};
         List<ImportSheetData> list = new ArrayList<>();
-        ImportSheetData importSheetData1 = new ImportSheetData(fields1,"contracts","Sheet1",1,0,3, Contract.class);
+        ImportSheetData importSheetData1 = new ImportSheetData(fields1,"contracts","Sheet1",1,0,4, Contract.class);
         list.add(importSheetData1);
         Map<String,List> map = ExcelTool.uploadData(request,list);
+        String token = request.getParameter("token");
+        String loginName = cacheManager.getCache(CacheName.PCTOKENS).get(token,String.class);
         if(map!=null){
             List<Contract> list1 = map.get("contracts");
             for(Contract contract:list1){
                 if(StringUtils.isBlank(contract.getWarnName())){
-                    contract.setWarnName(SysUtils.getSysUser().getLoginName());
+                    contract.setWarnName(loginName);
                     contract.setStatus(0);
                 }
-                contract.setCreateBy(SysUtils.getSysUser().getLoginName());
+                contract.setCreateBy(loginName);
                 contract.setCreateTime(new Date());
                 contractMapper.insertContract(contract);
             }
@@ -68,9 +70,9 @@ public class UploadController {
     }
 
     @GetMapping("/query")
-    public JsonResult query(Contract contract){
+    public JsonResult query(Contract contract,HttpServletRequest request){
         List<Contract> list = contractMapper.selectContractList(contract);
-        return JsonResult.ok().put("data",list);
+        return JsonResult.ok().put("data",list).put("token",request.getHeader("token"));
     }
 
     //处理文件上传

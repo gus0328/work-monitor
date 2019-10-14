@@ -3,17 +3,16 @@ package com.iccm.system.controller;
 import com.iccm.common.BaseController;
 import com.iccm.common.ExcelUtil;
 import com.iccm.common.JsonResult;
+import com.iccm.common.SysUtils;
 import com.iccm.common.annotation.Log;
 import com.iccm.common.annotation.PermissionsApi;
 import com.iccm.common.annotation.RequiresPermissions;
 import com.iccm.common.enums.BusinessType;
+import com.iccm.system.mapper.SiteWorkMapper;
 import com.iccm.system.model.*;
 import com.iccm.system.service.ISiteWorkService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,6 +28,9 @@ import java.util.List;
 public class SiteWorkController extends BaseController {
     @Autowired
     private ISiteWorkService siteWorkService;
+
+    @Autowired
+    private SiteWorkMapper siteWorkMapper;
 
 
     /**
@@ -53,6 +55,15 @@ public class SiteWorkController extends BaseController {
 //    @RequiresPermissions(value = "分页查询现场作业列表", authorities = "post:work:siteWork:pageList")
     @PostMapping("/pageList")
     public JsonResult pageList(@RequestBody SiteWork siteWork) {
+        startPage();
+        List<SiteWork> list = siteWorkService.selectSiteWorkList(siteWork);
+        return JsonResult.ok().put("data", getDataTable(list));
+    }
+
+    @GetMapping("/ownPageList")
+    public JsonResult pageList(){
+        SiteWork siteWork = new SiteWork();
+        siteWork.setLeadUserId(SysUtils.getSysUser().getUserId());
         startPage();
         List<SiteWork> list = siteWorkService.selectSiteWorkList(siteWork);
         return JsonResult.ok().put("data", getDataTable(list));
@@ -137,5 +148,20 @@ public class SiteWorkController extends BaseController {
     @PostMapping("/monitorSelect")
     public JsonResult getMonitorDeviceSelectList(@RequestBody MonitorDevice monitorDevice) {
         return JsonResult.ok().put("data",siteWorkService.getMonitorDeviceSelectList(monitorDevice));
+    }
+
+    /**
+     * 更改状态
+     * @param workStatus
+     * @param postModel
+     * @return
+     */
+    @PostMapping("/changeWorkStatus")
+    public JsonResult changeWorkStatus(@RequestParam("workStatus") int workStatus, @RequestBody PostModel postModel){
+        SiteWork siteWork = new SiteWork();
+        siteWork.setId(postModel.getId());
+        siteWork.setWorkStatus(workStatus);
+        siteWorkMapper.updateSiteWork(siteWork);
+        return JsonResult.ok().put("status",workStatus);
     }
 }

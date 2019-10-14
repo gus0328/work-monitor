@@ -28,6 +28,14 @@ public interface IMessageService
     public List<Message> selectMessageList(Message message);
 
     /**
+     * 查询消息管理列表
+     *
+     * @param message 消息管理
+     * @return 消息管理集合
+     */
+    public List<Message> selectMessageList1(Message message);
+
+    /**
      * 新增消息管理
      *
      * @param message 消息管理

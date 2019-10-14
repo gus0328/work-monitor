@@ -96,5 +96,4 @@ public class MainController {
         sysUserMapper.updateUser(sysUser);
         return JsonResult.ok();
     }
-
 }

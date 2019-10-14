@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iccm.system.mapper.FeedbackMapper">
+
+    <resultMap type="Feedback" id="FeedbackResult">
+        <result property="id"    column="id"    />
+        <result property="title"    column="title"    />
+        <result property="content"    column="content"    />
+        <result property="replyContent"    column="reply_content"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createById"    column="create_by_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="detpName"    column="detp_name"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectFeedbackVo">
+        select id, title, content, reply_content, create_by, create_by_id, create_time, detp_name, update_by, update_time, status from feedback
+    </sql>
+
+    <sql id="appSelectFeedbackVo">
+        select id, title,create_time,status FROM feedback
+    </sql>
+
+    <select id="selectAppUnreadCount" parameterType="Object" resultType="int">
+        select count(*) FROM feedback WHERE create_by_id = #{userId} and status = 2
+    </select>
+
+    <select id="appSelectFeedbackList" parameterType="Object" resultMap="FeedbackResult">
+        <include refid="appSelectFeedbackVo"/>
+        <where>
+            <if test="title != null  and title != ''"> and title LIKE concat('%', #{title}, '%')</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="replyContent != null  and replyContent != ''"> and reply_content = #{replyContent}</if>
+            <if test="createBy != null "> and create_by like concat('%', #{createBy}, '%')</if>
+            <if test="detpName != null  and detpName != ''"> and detp_name like concat('%', #{detpName}, '%')</if>
+            <if test="status != null and status !=4 "> and status = #{status}</if>
+            <if test="status == 4">
+                and status in (2,3)
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(create_time,'%y%m%d%T') &gt;= date_format(#{params.beginTime},'%y%m%d%T')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                and date_format(create_time,'%y%m%d%T') &lt;= date_format(#{params.endTime},'%y%m%d%T')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectFeedbackList" parameterType="Feedback" resultMap="FeedbackResult">
+        <include refid="selectFeedbackVo"/>
+        <where>
+            <if test="title != null  and title != ''"> and title LIKE concat('%', #{title}, '%')</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="replyContent != null  and replyContent != ''"> and reply_content = #{replyContent}</if>
+            <if test="createBy != null "> and create_by like concat('%', #{createBy}, '%')</if>
+            <if test="detpName != null  and detpName != ''"> and detp_name like concat('%', #{detpName}, '%')</if>
+            <if test="status != null and status !=4 "> and status = #{status}</if>
+            <if test="status == 4">
+                and status in (2,3)
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(create_time,'%y%m%d%T') &gt;= date_format(#{params.beginTime},'%y%m%d%T')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                and date_format(create_time,'%y%m%d%T') &lt;= date_format(#{params.endTime},'%y%m%d%T')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectFeedbackById" parameterType="Long" resultMap="FeedbackResult">
+        <include refid="selectFeedbackVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertFeedback" parameterType="Feedback" useGeneratedKeys="true" keyProperty="id">
+        insert into feedback
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null  and title != ''">title,</if>
+            <if test="content != null  and content != ''">content,</if>
+            <if test="replyContent != null  and replyContent != ''">reply_content,</if>
+            <if test="createBy != null  and createBy != ''">create_by,</if>
+            <if test="createById != null ">create_by_id,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="detpName != null  and detpName != ''">detp_name,</if>
+            <if test="updateBy != null  and updateBy != ''">update_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="status != null ">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null  and title != ''">#{title},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="replyContent != null  and replyContent != ''">#{replyContent},</if>
+            <if test="createBy != null  and createBy != ''">#{createBy},</if>
+            <if test="createById != null ">#{createById},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="detpName != null  and detpName != ''">#{detpName},</if>
+            <if test="updateBy != null  and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="status != null ">#{status},</if>
+        </trim>
+    </insert>
+
+    <update id="updateFeedback" parameterType="Feedback">
+        update feedback
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null  and title != ''">title = #{title},</if>
+            <if test="content != null  and content != ''">content = #{content},</if>
+            <if test="replyContent != null  and replyContent != ''">reply_content = #{replyContent},</if>
+            <if test="createBy != null  and createBy != ''">create_by = #{createBy},</if>
+            <if test="createById != null ">create_by_id = #{createById},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="detpName != null  and detpName != ''">detp_name = #{detpName},</if>
+            <if test="updateBy != null  and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="status != null ">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFeedbackById" parameterType="Long">
+        delete from feedback where id = #{id}
+    </delete>
+
+    <delete id="deleteFeedbackByIds" parameterType="String">
+        delete from feedback where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

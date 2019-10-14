@@ -27,7 +27,11 @@ public class BaseController {
         if (StringUtils.isNotNull(pageNum) && StringUtils.isNotNull(pageSize))
         {
             String orderBy = SqlUtil.escapeOrderBySql(pageDomain.getOrderBy());
-            PageHelper.startPage(pageNum, pageSize, orderBy);
+            if(StringUtils.isBlank(orderBy)){
+                PageHelper.startPage(pageNum,pageSize);
+            }else{
+                PageHelper.startPage(pageNum, pageSize, orderBy);
+            }
         }
     }
 

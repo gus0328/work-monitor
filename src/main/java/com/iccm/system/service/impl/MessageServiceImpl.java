@@ -52,6 +52,18 @@ public class MessageServiceImpl implements IMessageService
     }
 
     /**
+     * 查询消息管理列表
+     *
+     * @param message 消息管理
+     * @return 消息管理
+     */
+    @Override
+    public List<Message> selectMessageList1(Message message)
+    {
+        return messageMapper.selectMessageList1(message);
+    }
+
+    /**
      * 新增消息管理
      *
      * @param message 消息管理

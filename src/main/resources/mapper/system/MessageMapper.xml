@@ -18,6 +18,10 @@
         select id, title, message, send_user, send_time, message_type, status from message
     </sql>
 
+    <sql id="selectMessageVo1">
+        select id, title, send_user, send_time, message_type, status from message
+    </sql>
+
     <select id="queryListByStatus" parameterType="Object" resultMap="MessageResult">
     SELECT
         id,
@@ -37,7 +41,6 @@
         WHERE
             user_id = #{userId}
     )
-    ORDER BY send_time DESC
     </select>
 
     <select id="queryDelListByStatus" parameterType="Object" resultMap="MessageResult">
@@ -104,6 +107,32 @@
             <if test="sendTime != null "> and send_time = #{sendTime}</if>
             <if test="messageType != null  and messageType != ''"> and message_type = #{messageType}</if>
             <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="selectMessageList1" parameterType="Message" resultMap="MessageResult">
+        <include refid="selectMessageVo1"/>
+        <where>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="message != null  and message != ''"> and message = #{message}</if>
+            <if test="sendUser != null  and sendUser != ''"> and send_user = #{sendUser}</if>
+            <if test="sendTime != null "> and send_time = #{sendTime}</if>
+            <if test="messageType != null  and messageType != ''"> and message_type = #{messageType}</if>
+            <if test="status != null and status!= 4"> and status = #{status}</if>
+            <if test="status == 4">
+                and status in (0,1)
+            </if>
+            <if test="userId != null">
+                AND id IN (
+                SELECT
+                message_id
+                FROM
+                user_message
+                WHERE
+                user_id = #{userId}
+                )
+            </if>
+            ORDER BY send_time DESC
         </where>
     </select>
 

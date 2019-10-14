@@ -45,6 +45,11 @@ public class Message
     @Excel(name = "状态")
     private Integer status;
 
+    /**
+     * 用户id,查询用
+     */
+    private Long userId;
+
     public Message(String title, String message, String sendUser, Date sendTime, String messageType, Integer status) {
         this.title = title;
         this.message = message;
