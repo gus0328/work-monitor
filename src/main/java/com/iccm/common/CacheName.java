@@ -24,4 +24,9 @@ public class CacheName {
      * siteWorkId
      */
     public static final String SITEWORKID = "siteWorkId";
+
+    /**
+     * opc 数据
+     */
+    public static final String OPCDATA = "opcData";
 }

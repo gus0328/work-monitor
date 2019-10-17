@@ -1,7 +1,9 @@
 package com.iccm.common.config;
 
+import com.iccm.system.opcServer.OpcTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletContext;
@@ -25,6 +27,8 @@ public class ApplicationListener implements ServletContextListener {
 
     public static ExecutorService executorService;
 
+    @Autowired
+    private OpcTask opcTask;
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {

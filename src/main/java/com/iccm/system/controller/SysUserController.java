@@ -6,15 +6,13 @@ import com.iccm.common.annotation.PermissionsApi;
 import com.iccm.common.annotation.RequiresPermissions;
 import com.iccm.common.page.TableDataInfo;
 import com.iccm.common.properties.SystemProperties;
-import com.iccm.common.utils.StringUtil;
+import com.iccm.common.utils.Md5Utils;
 import com.iccm.system.model.PostModel;
 import com.iccm.system.model.ResetPwd;
 import com.iccm.system.model.SysUser;
 import com.iccm.system.service.IRoleService;
 import com.iccm.system.service.ISysUserService;
-import com.wangfan.endecrypt.utils.EndecryptUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -143,7 +141,7 @@ public class SysUserController extends BaseController
         {
             return JsonResult.error("新增用户'" + user.getLoginName() + "'失败，邮箱账号已存在");
         }
-        user.setPassword(EndecryptUtils.encrytMd5(user.getPassword()));
+        user.setPassword(Md5Utils.hash(user.getPassword()));
         user.setCreateBy(SysUtils.getSysUser().getUserName());
         userService.insertUser(user);
         return JsonResult.ok();
@@ -165,7 +163,7 @@ public class SysUserController extends BaseController
             return JsonResult.error("修改用户'" + user.getLoginName() + "'失败，邮箱账号已存在");
         }
         if(StringUtils.isNotBlank(user.getPassword())&&user.getPassword().length()<30){
-            user.setPassword(EndecryptUtils.encrytMd5(user.getPassword()));
+            user.setPassword(Md5Utils.hash(user.getPassword()));
         }
         user.setUpdateBy(SysUtils.getSysUser().getUserName());
         userService.updateUser(user);
@@ -176,8 +174,8 @@ public class SysUserController extends BaseController
     public JsonResult resetPwdSave(HttpSession session,@Validated @RequestBody ResetPwd resetPwd)
     {
         SysUser sysUser = SysUtils.getSysUser();
-        if(sysUser.getPassword().equals(EndecryptUtils.encrytMd5(resetPwd.getOldPassword()))){
-            sysUser.setPassword(EndecryptUtils.encrytMd5(resetPwd.getNewPassword()));
+        if(sysUser.getPassword().equals(Md5Utils.hash(resetPwd.getOldPassword()))){
+            sysUser.setPassword(Md5Utils.hash(resetPwd.getNewPassword()));
             sysUser.setUpdateBy(SysUtils.getSysUser().getUserName());
             userService.resetUserPwd(sysUser);
             session.setAttribute("user",sysUser);
@@ -190,7 +188,7 @@ public class SysUserController extends BaseController
     public JsonResult resetPwd(@RequestBody PostModel postModel){
         SysUser sysUser = new SysUser();
         sysUser.setUserId(Long.parseLong(postModel.getId()));
-        sysUser.setPassword(EndecryptUtils.encrytMd5(systemProperties.getInitPass()));
+        sysUser.setPassword(Md5Utils.hash(systemProperties.getInitPass()));
         sysUser.setUpdateBy(SysUtils.getSysUser().getUserName());
         userService.updateUserInfo(sysUser);
         return JsonResult.ok("用户密码已重置");

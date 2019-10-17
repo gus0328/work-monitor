@@ -11,6 +11,7 @@ import com.iccm.common.enums.OperatorType;
 import com.iccm.common.properties.SystemProperties;
 import com.iccm.common.utils.AddressUtils;
 import com.iccm.common.utils.IpUtils;
+import com.iccm.common.utils.Md5Utils;
 import com.iccm.common.websocket.MessageDeal;
 import com.iccm.common.websocket.MessageType;
 import com.iccm.common.websocket.SystemNoticeType;
@@ -19,7 +20,6 @@ import com.iccm.system.model.AppTokenInfo;
 import com.iccm.system.model.LoginParams;
 import com.iccm.system.model.SysLogininfor;
 import com.iccm.system.model.SysUser;
-import com.wangfan.endecrypt.utils.EndecryptUtils;
 import eu.bitwalker.useragentutils.UserAgent;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +62,7 @@ public class LoginService {
         SysUser user = sysUserService.selectUserByLoginName(loginParams.getUsername());
         if (jsonResult==null&&user == null) {
             jsonResult = JsonResult.ok(-1,"账号不存在");
-        } else if (jsonResult==null&&!user.getPassword().equals(EndecryptUtils.encrytMd5(loginParams.getPassword()))) {
+        } else if (jsonResult==null&&!user.getPassword().equals(Md5Utils.hash(loginParams.getPassword()))) {
             jsonResult = JsonResult.ok(-1,"密码错误");
         } else if (jsonResult==null&&"1".equals(user.getStatus())) {
             jsonResult = JsonResult.ok(-1,"账号被锁定");

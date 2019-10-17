@@ -116,10 +116,11 @@
 
         <!-- 加密解密工具类 -->
         <dependency>
-            <groupId>com.github.whvcse</groupId>
-            <artifactId>EndecryptUtil</artifactId>
-            <version>1.0.5</version>
+            <groupId>com.joyent.util</groupId>
+            <artifactId>fast-md5</artifactId>
+            <version>2.7.1</version>
         </dependency>
+
         <!-- 验证码 -->
         <dependency>
             <groupId>com.github.penggle</groupId>
@@ -176,6 +177,25 @@
             <groupId>eu.bitwalker</groupId>
             <artifactId>UserAgentUtils</artifactId>
             <version>${bitwalker.version}</version>
+        </dependency>
+
+        <!-- opc client -->
+        <dependency>
+            <groupId>org.openscada.utgard</groupId>
+            <artifactId>org.openscada.opc.lib</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openscada.utgard</groupId>
+            <artifactId>org.openscada.opc.dcom</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jinterop</groupId>
+            <artifactId>j-interop</artifactId>
+            <version>3.0.0</version>
         </dependency>
 
     </dependencies>

@@ -27,4 +27,16 @@ public class SystemProperties {
     private int appTokenTime;
 
     private String avatorPath;
+
+    private String opcHost;
+
+    private String opcDomain;
+
+    private String opcUser;
+
+    private String opcPassword;
+
+    private String opcClsid;
+
+    private int opcMillis;
 }

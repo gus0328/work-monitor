@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iccm.system.mapper.MobileDeviceMapper">
+    
+    <resultMap type="MobileDevice" id="MobileDeviceResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="deviceType"    column="device_type"    />
+        <result property="systemVersion"    column="system_version"    />
+        <result property="isRoot"    column="is_root"    />
+        <result property="deviceStatus"    column="device_status"    />
+        <result property="loginName"    column="login_name"    />
+        <result property="userName"    column="user_name"    />
+        <result property="deviceName"    column="device_name"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectMobileDeviceVo">
+        select id, user_id, device_id, device_type, system_version, is_root, device_status, login_name, user_name, device_name, create_time from mobile_device
+    </sql>
+
+    <select id="selectIdByDeviceId" parameterType="Object" resultType="int">
+        SELECT id FROM mobile_device WHERE device_id = #{deviceId}
+    </select>
+
+    <select id="selectMobileDeviceList" parameterType="MobileDevice" resultMap="MobileDeviceResult">
+        <include refid="selectMobileDeviceVo"/>
+        <where>  
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="deviceId != null  and deviceId != ''"> and device_id = #{deviceId}</if>
+            <if test="deviceType != null  and deviceType != ''"> and device_type = #{deviceType}</if>
+            <if test="systemVersion != null  and systemVersion != ''"> and system_version = #{systemVersion}</if>
+            <if test="isRoot != null  and isRoot != ''"> and is_root = #{isRoot}</if>
+            <if test="deviceStatus != null "> and device_status = #{deviceStatus}</if>
+            <if test="loginName != null  and loginName != ''"> and login_name like concat('%', #{loginName}, '%')</if>
+            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
+            <if test="deviceName != null  and deviceName != ''"> and device_name like concat('%', #{deviceName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectMobileDeviceById" parameterType="Long" resultMap="MobileDeviceResult">
+        <include refid="selectMobileDeviceVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMobileDevice" parameterType="MobileDevice" useGeneratedKeys="true" keyProperty="id">
+        insert into mobile_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null ">user_id,</if>
+            <if test="deviceId != null  and deviceId != ''">device_id,</if>
+            <if test="deviceType != null  and deviceType != ''">device_type,</if>
+            <if test="systemVersion != null  and systemVersion != ''">system_version,</if>
+            <if test="isRoot != null  and isRoot != ''">is_root,</if>
+            <if test="deviceStatus != null ">device_status,</if>
+            <if test="loginName != null  and loginName != ''">login_name,</if>
+            <if test="userName != null  and userName != ''">user_name,</if>
+            <if test="deviceName != null  and deviceName != ''">device_name,</if>
+            <if test="createTime != null ">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null ">#{userId},</if>
+            <if test="deviceId != null  and deviceId != ''">#{deviceId},</if>
+            <if test="deviceType != null  and deviceType != ''">#{deviceType},</if>
+            <if test="systemVersion != null  and systemVersion != ''">#{systemVersion},</if>
+            <if test="isRoot != null  and isRoot != ''">#{isRoot},</if>
+            <if test="deviceStatus != null ">#{deviceStatus},</if>
+            <if test="loginName != null  and loginName != ''">#{loginName},</if>
+            <if test="userName != null  and userName != ''">#{userName},</if>
+            <if test="deviceName != null  and deviceName != ''">#{deviceName},</if>
+            <if test="createTime != null ">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMobileDevice" parameterType="MobileDevice">
+        update mobile_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null ">user_id = #{userId},</if>
+            <if test="deviceId != null  and deviceId != ''">device_id = #{deviceId},</if>
+            <if test="deviceType != null  and deviceType != ''">device_type = #{deviceType},</if>
+            <if test="systemVersion != null  and systemVersion != ''">system_version = #{systemVersion},</if>
+            <if test="isRoot != null  and isRoot != ''">is_root = #{isRoot},</if>
+            <if test="deviceStatus != null ">device_status = #{deviceStatus},</if>
+            <if test="loginName != null  and loginName != ''">login_name = #{loginName},</if>
+            <if test="userName != null  and userName != ''">user_name = #{userName},</if>
+            <if test="deviceName != null  and deviceName != ''">device_name = #{deviceName},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMobileDeviceById" parameterType="Long">
+        delete from mobile_device where id = #{id}
+    </delete>
+
+    <delete id="deleteMobileDeviceByIds" parameterType="String">
+        delete from mobile_device where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

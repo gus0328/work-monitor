@@ -133,4 +133,9 @@ public class SysUser extends BaseEntity
      */
     private String rpassword;
 
+    /**
+     * 最近登录移动端设备id
+     */
+    private String deviceId;
+
 }

@@ -1,69 +1,85 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iccm.system.mapper.UpdateNoticeMapper">
-    
+
     <resultMap type="UpdateNotice" id="UpdateNoticeResult">
         <result property="id"    column="id"    />
         <result property="versionCode"    column="version_code"    />
-        <result property="contentUrl"    column="content_url"    />
+        <result property="downloadAddr"    column="download_addr"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
+        <result property="clientName"    column="client_name"    />
+        <result property="sortNum"    column="sort_num"    />
+        <result property="desc"    column="desc"    />
+        <result property="forceUpdate"    column="force_update"    />
     </resultMap>
 
     <sql id="selectUpdateNoticeVo">
-        select id, version_code, content_url, create_by, create_time, update_by, update_time from update_notice
+        select id, version_code, download_addr, create_by, create_time, update_by, update_time, client_name, sort_num, desc, force_update from update_notice
     </sql>
-
-    <select id="selectByVersionCode" parameterType="Object" resultMap="UpdateNoticeResult">
-        SELECT version_code, content_url FROM update_notice WHERE version_code = #{versionCode}
-    </select>
 
     <select id="selectUpdateNoticeList" parameterType="UpdateNotice" resultMap="UpdateNoticeResult">
         <include refid="selectUpdateNoticeVo"/>
-        <where>  
-            <if test="versionCode != null  and versionCode != ''"> and version_code like concat('%', #{versionCode}, '%')</if>
-            <if test="contentUrl != null  and contentUrl != ''"> and content_url = #{contentUrl}</if>
+        <where>
+            <if test="versionCode != null  and versionCode != ''"> and version_code = #{versionCode}</if>
+            <if test="downloadAddr != null  and downloadAddr != ''"> and download_addr = #{downloadAddr}</if>
+            <if test="clientName != null  and clientName != ''"> and client_name like concat('%', #{clientName}, '%')</if>
+            <if test="sortNum != null "> and sort_num = #{sortNum}</if>
+            <if test="desc != null  and desc != ''"> and desc = #{desc}</if>
+            <if test="forceUpdate != null "> and force_update = #{forceUpdate}</if>
         </where>
     </select>
-    
+
     <select id="selectUpdateNoticeById" parameterType="Long" resultMap="UpdateNoticeResult">
         <include refid="selectUpdateNoticeVo"/>
         where id = #{id}
     </select>
-        
+
     <insert id="insertUpdateNotice" parameterType="UpdateNotice" useGeneratedKeys="true" keyProperty="id">
         insert into update_notice
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="versionCode != null  and versionCode != ''">version_code,</if>
-            <if test="contentUrl != null  and contentUrl != ''">content_url,</if>
+            <if test="downloadAddr != null  and downloadAddr != ''">download_addr,</if>
             <if test="createBy != null  and createBy != ''">create_by,</if>
             <if test="createTime != null ">create_time,</if>
             <if test="updateBy != null  and updateBy != ''">update_by,</if>
             <if test="updateTime != null ">update_time,</if>
-         </trim>
+            <if test="clientName != null  and clientName != ''">client_name,</if>
+            <if test="sortNum != null ">sort_num,</if>
+            <if test="desc != null  and desc != ''">desc,</if>
+            <if test="forceUpdate != null ">force_update,</if>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="versionCode != null  and versionCode != ''">#{versionCode},</if>
-            <if test="contentUrl != null  and contentUrl != ''">#{contentUrl},</if>
+            <if test="downloadAddr != null  and downloadAddr != ''">#{downloadAddr},</if>
             <if test="createBy != null  and createBy != ''">#{createBy},</if>
             <if test="createTime != null ">#{createTime},</if>
             <if test="updateBy != null  and updateBy != ''">#{updateBy},</if>
             <if test="updateTime != null ">#{updateTime},</if>
-         </trim>
+            <if test="clientName != null  and clientName != ''">#{clientName},</if>
+            <if test="sortNum != null ">#{sortNum},</if>
+            <if test="desc != null  and desc != ''">#{desc},</if>
+            <if test="forceUpdate != null ">#{forceUpdate},</if>
+        </trim>
     </insert>
 
     <update id="updateUpdateNotice" parameterType="UpdateNotice">
         update update_notice
         <trim prefix="SET" suffixOverrides=",">
             <if test="versionCode != null  and versionCode != ''">version_code = #{versionCode},</if>
-            <if test="contentUrl != null  and contentUrl != ''">content_url = #{contentUrl},</if>
+            <if test="downloadAddr != null  and downloadAddr != ''">download_addr = #{downloadAddr},</if>
             <if test="createBy != null  and createBy != ''">create_by = #{createBy},</if>
             <if test="createTime != null ">create_time = #{createTime},</if>
             <if test="updateBy != null  and updateBy != ''">update_by = #{updateBy},</if>
             <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="clientName != null  and clientName != ''">client_name = #{clientName},</if>
+            <if test="sortNum != null ">sort_num = #{sortNum},</if>
+            <if test="desc != null  and desc != ''">desc = #{desc},</if>
+            <if test="forceUpdate != null ">force_update = #{forceUpdate},</if>
         </trim>
         where id = #{id}
     </update>
@@ -73,10 +89,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteUpdateNoticeByIds" parameterType="String">
-        delete from update_notice where id in 
+        delete from update_notice where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
     </delete>
-    
+
 </mapper>

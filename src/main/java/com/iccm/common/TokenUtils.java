@@ -1,8 +1,8 @@
 package com.iccm.common;
 
 import com.iccm.common.properties.TokenKey;
+import com.iccm.common.utils.Md5Utils;
 import com.iccm.common.utils.UUIDUtil;
-import com.wangfan.endecrypt.utils.EndecryptUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
@@ -20,10 +20,10 @@ public class TokenUtils {
     private TokenKey tokenKey;
 
     public String createPcToken(String userCode,String sessionId){
-        return EndecryptUtils.encrytMd5(userCode+sessionId+tokenKey.getPcToken());
+        return Md5Utils.hash(userCode+sessionId+tokenKey.getPcToken());
     }
 
     public String createAppToken(){
-        return EndecryptUtils.encrytMd5(UUIDUtil.randomUUID32()+tokenKey.getAppToken());
+        return Md5Utils.hash(UUIDUtil.randomUUID32()+tokenKey.getAppToken());
     }
 }
