@@ -11,10 +11,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="workId"    column="work_id"    />
         <result property="gasDeviceId"    column="gas_device_id"    />
         <result property="orderNum"    column="order_num"    />
+        <result property="purpose"    column="purpose"    />
+        <result property="spareWord1"    column="spare_word1"    />
     </resultMap>
 
     <sql id="selectSiteGasVo">
-        select id, item_code, item_name, work_id, gas_device_id, order_num from site_gas
+        select id, item_code, item_name, work_id, gas_device_id, order_num,spare_word1,purpose from site_gas
     </sql>
 
     <select id="selectSiteGasList" parameterType="SiteGas" resultMap="SiteGasResult">
@@ -46,6 +48,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="workId != null  and workId != ''">work_id,</if>
             <if test="gasDeviceId != null ">gas_device_id,</if>
             <if test="orderNum != null ">order_num,</if>
+            <if test="purpose != null  and purpose != ''">purpose,</if>
+            <if test="spareWord1 != null  and spareWord1 != ''">spare_word1,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="itemCode != null  and itemCode != ''">#{itemCode},</if>
@@ -53,6 +57,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="workId != null  and workId != ''">#{workId},</if>
             <if test="gasDeviceId != null ">#{gasDeviceId},</if>
             <if test="orderNum != null ">#{orderNum},</if>
+            <if test="purpose != null  and purpose != ''">#{purpose},</if>
+            <if test="spareWord1 != null  and spareWord1 != ''">#{spareWord1},</if>
          </trim>
     </insert>
 

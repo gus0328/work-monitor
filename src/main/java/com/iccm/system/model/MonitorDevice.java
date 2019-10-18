@@ -44,4 +44,12 @@ public class MonitorDevice extends BaseEntity
     @Excel(name = "备用字段3")
     private String spareWord3;
 
+    public String getRtspUrl(){
+        return "rtsp://"+itemCode+":"+itemName+"@"+ipAdress+":"+spareWord1+"/MPEG-4/ch1/main/";
+    }
+
+    public String getRtmpUrl(){
+        return "rtmp://127.0.0.1:1935/live/"+ipAdress.replace(".","");
+    }
+
 }

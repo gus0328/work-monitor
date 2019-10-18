@@ -44,6 +44,19 @@ public class SiteWorkController extends BaseController {
         return JsonResult.ok().put("data", list);
     }
 
+    /**
+     * 查询个人负责现场列表
+     * @param siteWork
+     * @return
+     */
+    @PostMapping("/ownlist")
+    public JsonResult ownList(@RequestBody SiteWork siteWork) {
+        SysUser sysUser = SysUtils.getSysUser();
+        siteWork.setLeadUserId(sysUser.getUserId());
+        List<SiteWork> list = siteWorkService.selectSiteWorkList(siteWork);
+        return JsonResult.ok().put("data", list);
+    }
+
 //    public JsonResult getWorkDetails(@RequestBody PostModel postModel){
 //
 //    }
@@ -55,6 +68,19 @@ public class SiteWorkController extends BaseController {
 //    @RequiresPermissions(value = "分页查询现场作业列表", authorities = "post:work:siteWork:pageList")
     @PostMapping("/pageList")
     public JsonResult pageList(@RequestBody SiteWork siteWork) {
+        startPage();
+        List<SiteWork> list = siteWorkService.selectSiteWorkList(siteWork);
+        return JsonResult.ok().put("data", getDataTable(list));
+    }
+
+    /**
+     * 分页查询现场作业列表
+     */
+//    @Log(title = "现场作业管理", businessType = BusinessType.QUERY)
+//    @RequiresPermissions(value = "分页查询现场作业列表", authorities = "post:work:siteWork:pageList")
+    @PostMapping("/ownPageList")
+    public JsonResult ownPageList(@RequestBody SiteWork siteWork) {
+        siteWork.setLeadUserId(SysUtils.getSysUser().getUserId());
         startPage();
         List<SiteWork> list = siteWorkService.selectSiteWorkList(siteWork);
         return JsonResult.ok().put("data", getDataTable(list));
@@ -88,6 +114,21 @@ public class SiteWorkController extends BaseController {
 //    @RequiresPermissions(value = "新增保存现场作业", authorities = "post:work:siteWork:add")
     @PostMapping("/add")
     public JsonResult addSave(@RequestBody SiteWorkVo siteWorkVo) {
+        siteWorkService.insertSiteWork(siteWorkVo);
+        return JsonResult.ok();
+    }
+
+    /**
+     * 新增保存现场作业
+     */
+//    @Log(title = "现场作业管理", businessType = BusinessType.INSERT)
+//    @RequiresPermissions(value = "新增保存现场作业", authorities = "post:work:siteWork:add")
+    @PostMapping("/ownAdd")
+    public JsonResult ownAddSave(@RequestBody SiteWorkVo siteWorkVo) {
+        SysUser sysUser = SysUtils.getSysUser();
+        SiteWork siteWork = siteWorkVo.getSiteWork();
+        siteWork.setLeadUserId(sysUser.getUserId());
+        siteWork.setLeadUserName(sysUser.getUserName());
         siteWorkService.insertSiteWork(siteWorkVo);
         return JsonResult.ok();
     }

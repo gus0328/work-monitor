@@ -198,6 +198,13 @@
             <version>3.0.0</version>
         </dependency>
 
+        <!-- rtsp 转 rtmp -->
+        <dependency>
+            <groupId>ffmpeg</groupId>
+            <artifactId>commandhandler</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

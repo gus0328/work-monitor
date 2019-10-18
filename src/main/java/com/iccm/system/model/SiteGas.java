@@ -40,6 +40,16 @@ public class SiteGas extends BaseEntity
     @Excel(name = "排序编号")
     private Long orderNum;
 
+    /**
+     * 区域
+     */
+    private String purpose;
+
+    /**
+     * 设备类型
+     */
+    private String spareWord1;
+
     public SiteGas(String workId) {
         this.workId = workId;
     }

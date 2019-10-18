@@ -44,6 +44,11 @@ public class SiteMonitor extends BaseEntity
     @Excel(name = "排序编号")
     private Long orderNum;
 
+    /**
+     * 备注
+     */
+    private String remark;
+
     public SiteMonitor(String workId) {
         this.workId = workId;
     }

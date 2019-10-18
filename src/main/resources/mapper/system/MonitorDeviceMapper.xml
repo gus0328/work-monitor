@@ -24,14 +24,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="itemCode"    column="item_code"    />
         <result property="itemName"    column="item_name"    />
         <result property="ipAdress"    column="ip_adress"    />
+        <result property="remark"    column="remark"    />
     </resultMap>
 
     <select id="getSelectList" parameterType="Object" resultMap="siteMonitorDeviceResult">
-        select id, item_code, item_name, ip_adress FROM monitor_device
+        select id, item_code, item_name, ip_adress,remark FROM monitor_device
         <where>
             <if test="itemCode != null  and itemCode != ''"> and item_code like concat('%', #{itemCode}, '%')</if>
             <if test="itemName != null  and itemName != ''"> and item_name like concat('%', #{itemName}, '%')</if>
-            <if test="ipAdress != null  and ipAdress != ''"> and ip_adress = #{ipAdress}</if>
+            <if test="ipAdress != null  and ipAdress != ''"> and ip_adress like concat('%', #{ipAdress}, '%')</if>
             <if test="spareWord1 != null  and spareWord1 != ''"> and spare_word1 = #{spareWord1}</if>
             <if test="spareWord2 != null  and spareWord2 != ''"> and spare_word2 = #{spareWord2}</if>
             <if test="spareWord3 != null  and spareWord3 != ''"> and spare_word3 = #{spareWord3}</if>
@@ -48,7 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>  
             <if test="itemCode != null  and itemCode != ''"> and item_code like concat('%', #{itemCode}, '%')</if>
             <if test="itemName != null  and itemName != ''"> and item_name like concat('%', #{itemName}, '%')</if>
-            <if test="ipAdress != null  and ipAdress != ''"> and ip_adress = #{ipAdress}</if>
+            <if test="ipAdress != null  and ipAdress != ''"> and ip_adress like concat('%', #{ipAdress}, '%')</if>
             <if test="spareWord1 != null  and spareWord1 != ''"> and spare_word1 = #{spareWord1}</if>
             <if test="spareWord2 != null  and spareWord2 != ''"> and spare_word2 = #{spareWord2}</if>
             <if test="spareWord3 != null  and spareWord3 != ''"> and spare_word3 = #{spareWord3}</if>
