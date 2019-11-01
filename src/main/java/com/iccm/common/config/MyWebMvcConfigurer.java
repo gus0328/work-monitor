@@ -53,7 +53,7 @@ public class MyWebMvcConfigurer implements WebMvcConfigurer {
                 excludePathPatterns("/login/*").
                 excludePathPatterns("/captcha/captchaImage").
                 excludePathPatterns("/upload/**").
-                excludePathPatterns("/avator/**");
+                excludePathPatterns("/avator/**").excludePathPatterns("/js/**");
         registry.addInterceptor(uploadInterceptor).addPathPatterns("/upload/**").excludePathPatterns("/upload/test").excludePathPatterns("/upload/query");
     }
 
@@ -74,5 +74,6 @@ public class MyWebMvcConfigurer implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/avator/**").addResourceLocations("file:"+systemProperties.getAvatorPath()+"/");
+        registry.addResourceHandler("/js/**").addResourceLocations("classpath:/static/js/");
     }
 }

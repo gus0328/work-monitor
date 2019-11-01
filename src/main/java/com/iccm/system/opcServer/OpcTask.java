@@ -2,6 +2,8 @@ package com.iccm.system.opcServer;
 
 import com.iccm.common.CacheName;
 import com.iccm.common.properties.SystemProperties;
+import com.iccm.system.mapper.SiteGasMapper;
+import com.iccm.system.mapper.SiteWorkerMapper;
 import org.openscada.opc.lib.da.AccessBase;
 import org.openscada.opc.lib.da.SyncAccess;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +25,18 @@ public class OpcTask {
     @Autowired
     private CacheManager cacheManager;
 
-    private Map<String,AccessBase> itemMap;
+    private AccessBase accessBase;
+
+    private Map<String,Boolean> itemMap;
 
     @Autowired
     private SystemProperties systemProperties;
+
+    @Autowired
+    private SiteWorkerMapper siteWorkerMapper;
+
+    @Autowired
+    private SiteGasMapper siteGasMapper;
 
     /**
      * 添加
@@ -34,24 +44,25 @@ public class OpcTask {
      */
     public void addNewItem(String itemId) {
         try{
+            if(accessBase==null){
+                accessBase = new SyncAccess(opcConfig.getServer(), systemProperties.getOpcMillis());
+            }
             if(itemMap==null){
                 itemMap = new HashMap<>();
             }
             if(itemMap.get(itemId)==null){
-                final AccessBase access = new SyncAccess(opcConfig.getServer(), systemProperties.getOpcMillis());
-                itemMap.put(itemId,access);
-                access.addItem(itemId, (item, state) ->{
+                itemMap.put(itemId,true);
+                accessBase.addItem(itemId, (item, state) ->{
                     if(state.getErrorCode()==0){
                         String valueStr = state.getValue().toString();
                         cacheManager.getCache(CacheName.OPCDATA).put(itemId,valueStr.substring(2,valueStr.length()-2));
-                        System.out.println(get("4000AI1100_1.DACA.PV",String.class));
                     }
                 });
                 // start reading
-                access.bind();
+                accessBase.bind();
             }
         }catch (Exception e){
-            //do nothing
+            e.printStackTrace();
         }
     }
 
@@ -59,17 +70,34 @@ public class OpcTask {
      * 删除
      * @param itemId
      */
-    public void removeItem(String itemId){
+    public int removeItem(String itemId,OpcTypeEnum opcTypeEnum){
+        switch (opcTypeEnum){
+            case siteGas:
+                if(siteGasMapper.verifyDeviceIfRunning(itemId)>0) {
+                    return -1;
+                }
+                break;
+            case siteWorker:
+                if(siteWorkerMapper.verifyDeviceIfRunning(itemId)>0){
+                    return -1;
+                }
+                break;
+        }
         try{
-            AccessBase accessBase = itemMap.get(itemId);
-            accessBase.unbind();
+            accessBase.removeItem(itemId);
             cacheManager.getCache(CacheName.OPCDATA).evict(itemId);
             itemMap.remove(itemId);
             if(itemMap.size()==0){
-                opcConfig.getServer().disconnect();
+                accessBase.unbind();
+                accessBase.clear();
+                accessBase.connectionStateChanged(false);
+                accessBase = null;
+                opcConfig.disconnect();
             }
+            return 1;
         }catch (Exception e){
             //do nothing
+            return -2;
         }
     }
 
@@ -81,6 +109,10 @@ public class OpcTask {
      * @return
      */
     public <T> T get(String itemId,Class<T> clazz){
-        return cacheManager.getCache(CacheName.OPCDATA).get(itemId,clazz);
+        try{
+            return cacheManager.getCache(CacheName.OPCDATA).get(itemId,clazz);
+        }catch (Exception e){
+            return null;
+        }
     }
 }

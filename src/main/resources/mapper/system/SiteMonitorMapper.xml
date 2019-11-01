@@ -13,10 +13,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="monitorDeviceId"    column="monitor_device_id"    />
         <result property="orderNum"    column="order_num"    />
         <result property="remark"    column="remark"    />
+        <result property="spareWord1"    column="spare_word1"    />
     </resultMap>
 
     <sql id="selectSiteMonitorVo">
-        select id, item_code, item_name, ip_adress, work_id, monitor_device_id, order_num,remark from site_monitor
+        select id, item_code, item_name, ip_adress, work_id, monitor_device_id, order_num,remark,spare_word1 from site_monitor
     </sql>
 
     <select id="selectSiteMonitorList" parameterType="SiteMonitor" resultMap="SiteMonitorResult">
@@ -35,6 +36,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectSiteMonitorVo"/>
         WHERE work_id = #{workId}
     </select>
+
+    <select id="verifyDeviceIfRunning" parameterType="Object" resultType="int">
+        SELECT
+        count(*)
+        FROM
+        site_monitor
+        WHERE
+        work_id in(
+        SELECT
+         work_id
+         FROM
+         site_work
+         WHERE
+         work_status = 1
+        )
+        AND
+        ip_adress = #{ipAdress}
+    </select>
     
     <select id="selectSiteMonitorById" parameterType="Long" resultMap="SiteMonitorResult">
         <include refid="selectSiteMonitorVo"/>
@@ -51,6 +70,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="monitorDeviceId != null ">monitor_device_id,</if>
             <if test="orderNum != null ">order_num,</if>
             <if test="remark != null  and remark != ''">remark,</if>
+            <if test="spareWord1 != null  and spareWord1 != ''">spare_word1,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="itemCode != null  and itemCode != ''">#{itemCode},</if>
@@ -59,7 +79,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="workId != null  and workId != ''">#{workId},</if>
             <if test="monitorDeviceId != null ">#{monitorDeviceId},</if>
             <if test="orderNum != null ">#{orderNum},</if>
-            <if test="remark != null  and remark != ''">#{remark}</if>
+            <if test="remark != null  and remark != ''">#{remark},</if>
+            <if test="spareWord1 != null  and spareWord1 != ''">#{spareWord1},</if>
          </trim>
     </insert>
 

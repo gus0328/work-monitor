@@ -24,11 +24,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="itemCode"    column="item_code"    />
         <result property="itemName"    column="item_name"    />
         <result property="ipAdress"    column="ip_adress"    />
+        <result property="spareWord1"    column="spare_word1"    />
         <result property="remark"    column="remark"    />
     </resultMap>
 
+    <select id="getRunningDevice" parameterType="Object" resultMap="MonitorDeviceResult" >
+        SELECT
+            distinct
+            item_code,
+            item_name,
+            ip_adress,
+            spare_word1
+        FROM
+            site_monitor
+        WHERE
+            work_id IN (
+                SELECT
+                    work_id
+                FROM
+                    site_work
+                WHERE
+                    work_status = 1
+            )
+    </select>
+
     <select id="getSelectList" parameterType="Object" resultMap="siteMonitorDeviceResult">
-        select id, item_code, item_name, ip_adress,remark FROM monitor_device
+        select id, item_code, item_name, ip_adress,remark,spare_word1 FROM monitor_device
         <where>
             <if test="itemCode != null  and itemCode != ''"> and item_code like concat('%', #{itemCode}, '%')</if>
             <if test="itemName != null  and itemName != ''"> and item_name like concat('%', #{itemName}, '%')</if>

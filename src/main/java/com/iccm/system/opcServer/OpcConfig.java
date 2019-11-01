@@ -39,6 +39,7 @@ public class OpcConfig {
         }
         if(!isConnect){
             server.connect();
+            isConnect = true;
         }
         return server;
     }

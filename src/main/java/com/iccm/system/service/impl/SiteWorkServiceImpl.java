@@ -7,9 +7,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.iccm.common.*;
 import com.iccm.common.utils.DateUtil;
 import com.iccm.common.utils.UUIDUtil;
+import com.iccm.system.ffmpeg.FfmpegTask;
 import com.iccm.system.mapper.*;
 import com.iccm.system.model.*;
+import com.iccm.system.opcServer.OpcTask;
+import com.iccm.system.opcServer.OpcTypeEnum;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
@@ -49,6 +53,12 @@ public class SiteWorkServiceImpl implements ISiteWorkService
     @Autowired
     private CacheManager cacheManager;
 
+    @Autowired
+    private OpcTask opcTask;
+
+    @Autowired
+    private FfmpegTask ffmpegTask;
+
     private static final String WORKID ="workId";
 
     /**
@@ -83,19 +93,19 @@ public class SiteWorkServiceImpl implements ISiteWorkService
      */
     @Transactional
     @Override
-    public int insertSiteWork(SiteWorkVo siteWorkVo)
+    public void insertSiteWork(SiteWorkVo siteWorkVo)
     {
         SiteWork siteWork = siteWorkVo.getSiteWork();
         siteWork.setId(createWorkId());
+        siteWork.setCreateBy(SysUtils.getSysUser().getUserName());
+        siteWork.setCreateTime(DateUtils.getNowDate());
+        siteWorkMapper.insertSiteWork(siteWork);
         List<SiteWorkerVo> workers = siteWorkVo.getWorkers();
         List<SiteGas> gases = siteWorkVo.getGases();
         List<SiteMonitor> monitors = siteWorkVo.getMonitors();
         insertSiteWorkers(workers,siteWork);
         insertSiteGases(gases,siteWork);
         insertSiteMonitors(monitors,siteWork);
-        siteWork.setCreateBy(SysUtils.getSysUser().getUserName());
-        siteWork.setCreateTime(DateUtils.getNowDate());
-        return siteWorkMapper.insertSiteWork(siteWork);
     }
 
     /**
@@ -106,7 +116,7 @@ public class SiteWorkServiceImpl implements ISiteWorkService
      */
     @Transactional
     @Override
-    public int updateSiteWork(SiteWorkVo siteWorkVo)
+    public void updateSiteWork(SiteWorkVo siteWorkVo)
     {
         SiteWork siteWork = siteWorkVo.getSiteWork();
         List<SiteWorkerVo> workers = siteWorkVo.getWorkers();
@@ -129,18 +139,16 @@ public class SiteWorkServiceImpl implements ISiteWorkService
                 break;
             case 3:
         }
-        if(status==3){
-            return 0;
-        }else {
-            insertSiteWorkers(workers,siteWork);
-            insertSiteGases(gases,siteWork);
-            insertSiteMonitors(monitors,siteWork);
+        if(status!=3){
             updateSiteWork.setUpdateBy(SysUtils.getSysUser().getUserName());
             updateSiteWork.setUpdateTime(DateUtils.getNowDate());
             if(updateSiteWork.getWorkStatus()==3){
                 updateSiteWork.setEndTime(DateUtil.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
             }
-            return siteWorkMapper.updateSiteWork(updateSiteWork);
+            siteWorkMapper.updateSiteWork(updateSiteWork);
+            insertSiteWorkers(workers,siteWork);
+            insertSiteGases(gases,siteWork);
+            insertSiteMonitors(monitors,siteWork);
         }
     }
 
@@ -201,7 +209,12 @@ public class SiteWorkServiceImpl implements ISiteWorkService
         long index = 0;
         for(SiteWorkerVo siteWorkerVo:workers) {
             for(SiteWorkerVo.WearDevice device:siteWorkerVo.getDevices()){
-                SiteWorker siteWorker = new SiteWorker(siteWorkerVo.getPersonName(),siteWorkerVo.getMobileNum(),siteWork.getId(),device.getWearDeviceId(),device.getItemCode(),device.getItemName(),index);
+                SiteWorker siteWorker = new SiteWorker(siteWorkerVo.getPersonName(),siteWorkerVo.getMobileNum(),siteWork.getId(),device.getWearDeviceId(),device.getItemCode(),device.getItemName(),index,device.getSpareWord1());
+                if(siteWork.getWorkStatus()==1){
+                    opcTask.addNewItem(device.getItemCode());
+                }else if(siteWork.getWorkStatus()==2||siteWork.getWorkStatus()==3){
+                    opcTask.removeItem(device.getItemCode(), OpcTypeEnum.siteWorker);
+                }
                 siteWorkerMapper.insertSiteWorker(siteWorker);
             }
             index++;
@@ -213,6 +226,11 @@ public class SiteWorkServiceImpl implements ISiteWorkService
         for(SiteGas siteGas:gases) {
             siteGas.setOrderNum(siteGasIndex);
             siteGas.setWorkId(siteWork.getId());
+            if(siteWork.getWorkStatus()==1){
+                opcTask.addNewItem(siteGas.getItemCode());
+            }else if(siteWork.getWorkStatus()==2||siteWork.getWorkStatus()==3){
+                opcTask.removeItem(siteGas.getItemCode(),OpcTypeEnum.siteGas);
+            }
             siteGasMapper.insertSiteGas(siteGas);
             siteGasIndex++;
         }
@@ -223,6 +241,13 @@ public class SiteWorkServiceImpl implements ISiteWorkService
         for(SiteMonitor siteMonitor:monitors){
             siteMonitor.setOrderNum(siteMonitorIndex);
             siteMonitor.setWorkId(siteWork.getId());
+            if(siteWork.getWorkStatus()==1){
+                MonitorDevice monitorDevice = new MonitorDevice();
+                BeanUtils.copyProperties(siteMonitor,monitorDevice);
+                ffmpegTask.addTask(monitorDevice);
+            }else if(siteWork.getWorkStatus()==2||siteWork.getWorkStatus()==3){
+                ffmpegTask.stopTask(siteMonitor.getIpAdress());
+            }
             siteMonitorMapper.insertSiteMonitor(siteMonitor);
             siteMonitorIndex++;
         }

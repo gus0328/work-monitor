@@ -39,4 +39,6 @@ public class SystemProperties {
     private String opcClsid;
 
     private int opcMillis;
+
+    private String hlsPath;
 }

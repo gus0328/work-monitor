@@ -1,6 +1,9 @@
 package com.iccm.common.config;
 
 import com.iccm.system.ffmpeg.FfmpegTask;
+import com.iccm.system.mapper.GasDeviceMapper;
+import com.iccm.system.mapper.MonitorDeviceMapper;
+import com.iccm.system.mapper.WearDeviceMapper;
 import com.iccm.system.model.MonitorDevice;
 import com.iccm.system.opcServer.OpcTask;
 import org.slf4j.Logger;
@@ -12,6 +15,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -35,24 +39,33 @@ public class ApplicationListener implements ServletContextListener {
     @Autowired
     private FfmpegTask ffmpegTask;
 
+    @Autowired
+    private MonitorDeviceMapper monitorDeviceMapper;
+
+    @Autowired
+    private GasDeviceMapper gasDeviceMapper;
+
+    @Autowired
+    private WearDeviceMapper wearDeviceMapper;
+
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         if(Application==null){
             Application = servletContextEvent.getServletContext();
             executorService = Executors.newFixedThreadPool(20);
             log.warn("- - - - - - - - 已初始化ServletContext- - - - - - - - - - ");
-            MonitorDevice monitorDevice = new MonitorDevice();
-            monitorDevice.setItemCode("admin");
-            monitorDevice.setItemName("admin123");
-            monitorDevice.setIpAdress("192.168.102.89");
-            monitorDevice.setSpareWord1("554");
-            MonitorDevice monitorDevice1 = new MonitorDevice();
-            monitorDevice1.setItemCode("admin");
-            monitorDevice1.setItemName("admin123");
-            monitorDevice1.setIpAdress("192.168.102.88");
-            monitorDevice1.setSpareWord1("554");
-            ffmpegTask.addTask(monitorDevice);
-            ffmpegTask.addTask(monitorDevice1);
+            List<MonitorDevice> runningDevice = monitorDeviceMapper.getRunningDevice();
+            runningDevice.forEach(monitorDevice -> {
+                ffmpegTask.addTask(monitorDevice);
+            });
+            List<String> wearDeviceItemId = wearDeviceMapper.getRunningItemId();
+            wearDeviceItemId.forEach(itemId ->{
+                opcTask.addNewItem(itemId);
+            });
+            List<String> runningItemId = gasDeviceMapper.getRunningItemId();
+            runningItemId.forEach(itemId ->{
+                opcTask.addNewItem(itemId);
+            });
         }
     }
     @Override

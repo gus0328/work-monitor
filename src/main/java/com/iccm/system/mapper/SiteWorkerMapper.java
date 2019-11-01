@@ -81,4 +81,11 @@ public interface SiteWorkerMapper
      * @return
      */
     public List<SiteWorkerVo.WearDevice> getDeviceList(SiteWorkerVo siteWorkerVo);
+
+    /**
+     * 验证设备是否在正在作业任务中
+     * @param itemCode
+     * @return
+     */
+    public int verifyDeviceIfRunning(String itemCode);
 }

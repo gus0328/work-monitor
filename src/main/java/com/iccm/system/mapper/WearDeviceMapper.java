@@ -65,4 +65,10 @@ public interface WearDeviceMapper
      * @return
      */
     public List<SiteWorkerVo.WearDevice> getSelectList(WearDevice wearDevice);
+
+    /**
+     * 查询正在作业的穿戴设备
+     * @return
+     */
+    public List<String> getRunningItemId();
 }

@@ -46,5 +46,10 @@ public class SiteWorkerVo {
         /** 排序编号 */
         @Excel(name = "排序编号")
         private Long orderNum;
+
+        /**
+         * 类型
+         */
+        private String spareWord1;
     }
 }

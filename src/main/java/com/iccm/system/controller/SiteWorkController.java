@@ -1,5 +1,6 @@
 package com.iccm.system.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.iccm.common.BaseController;
 import com.iccm.common.ExcelUtil;
 import com.iccm.common.JsonResult;
@@ -10,6 +11,7 @@ import com.iccm.common.annotation.RequiresPermissions;
 import com.iccm.common.enums.BusinessType;
 import com.iccm.system.mapper.SiteWorkMapper;
 import com.iccm.system.model.*;
+import com.iccm.system.opcServer.OpcTask;
 import com.iccm.system.service.ISiteWorkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +33,9 @@ public class SiteWorkController extends BaseController {
 
     @Autowired
     private SiteWorkMapper siteWorkMapper;
+
+    @Autowired
+    private OpcTask opcTask;
 
 
     /**
@@ -204,5 +209,28 @@ public class SiteWorkController extends BaseController {
         siteWork.setWorkStatus(workStatus);
         siteWorkMapper.updateSiteWork(siteWork);
         return JsonResult.ok().put("status",workStatus);
+    }
+
+    /**
+     * 定时获取作业数据
+     * @param workData
+     * @return
+     */
+    @PostMapping("/getWorkData")
+    public JsonResult getWorkData(@RequestBody WorkData workData){
+        WorkData.RemoteData remoteData = workData.getRemoteData();
+        remoteData.setDevice1(opcTask.get(remoteData.getDevice1(),String.class));
+        remoteData.setDevice2(opcTask.get(remoteData.getDevice2(),String.class));
+        remoteData.setDevice3(opcTask.get(remoteData.getDevice3(),String.class));
+        remoteData.setDevice4(opcTask.get(remoteData.getDevice4(),String.class));
+        remoteData.setDevice5(opcTask.get(remoteData.getDevice5(),String.class));
+        List<WorkData.Person> persons = workData.getPersons();
+        persons.forEach(person -> {
+            String bloodPress = opcTask.get(person.getHeightPress(),String.class)+"/"+ opcTask.get(person.getLowPress(),String.class)+"mmHg";
+            person.setBloodPress(bloodPress);
+            person.setHeartRate(opcTask.get(person.getHeartRate(),String.class)+"次/分钟");
+            person.setSkinT(opcTask.get(person.getSkinT(),String.class)+"℃");
+        });
+        return JsonResult.ok().put("data",workData);
     }
 }

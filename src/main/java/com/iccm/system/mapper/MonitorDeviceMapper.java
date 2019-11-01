@@ -66,4 +66,10 @@ public interface MonitorDeviceMapper
      * @return
      */
     public List<SiteMonitor> getSelectList(MonitorDevice monitorDevice);
+
+    /**
+     * 获取正在作业的视屏设备
+     * @return
+     */
+    public List<MonitorDevice> getRunningDevice();
 }

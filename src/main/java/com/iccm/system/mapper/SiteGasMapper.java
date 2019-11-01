@@ -72,4 +72,11 @@ public interface SiteGasMapper
      * @return
      */
     public List<SiteGas> getGasesByWorkId(String workId);
+
+    /**
+     * 验证设备是否在正在作业任务中
+     * @param itemCode
+     * @return
+     */
+    public int verifyDeviceIfRunning(String itemCode);
 }

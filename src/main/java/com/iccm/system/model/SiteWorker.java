@@ -48,6 +48,11 @@ public class SiteWorker extends BaseEntity
     @Excel(name = "排序编号")
     private Long orderNum;
 
+    /**
+     * 设备类型
+     */
+    private String spareWord1;
+
     public SiteWorker(String workId) {
         this.workId = workId;
     }
@@ -55,7 +60,7 @@ public class SiteWorker extends BaseEntity
     public SiteWorker() {
     }
 
-    public SiteWorker(String personName, String mobileNum, String workId, Long wearDeviceId, String itemCode, String itemName, Long orderNum) {
+    public SiteWorker(String personName, String mobileNum, String workId, Long wearDeviceId, String itemCode, String itemName, Long orderNum,String spareWord1) {
         this.personName = personName;
         this.mobileNum = mobileNum;
         this.workId = workId;
@@ -63,5 +68,6 @@ public class SiteWorker extends BaseEntity
         this.itemCode = itemCode;
         this.itemName = itemName;
         this.orderNum = orderNum;
+        this.spareWord1 = spareWord1;
     }
 }

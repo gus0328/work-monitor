@@ -72,4 +72,11 @@ public interface SiteMonitorMapper
      * @return
      */
     public List<SiteMonitor> getMonitorsByWorkId(String workId);
+
+    /**
+     * 验证设备是否在正在作业任务中
+     * @param ipAdress
+     * @return
+     */
+    public int verifyDeviceIfRunning(String ipAdress);
 }

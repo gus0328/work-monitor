@@ -33,13 +33,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wear_device_id,
             item_code,
             item_name,
-            order_num
+            order_num,
+            spare_word1
         FROM
             site_worker
-        WHERE
-            person_name = #{personName}
-        AND mobile_num = #{mobileNum}
-        AND work_id = #{workId}
+        <where>
+            <if test="personName != null  and personName != ''"> and person_name = #{personName}</if>
+            <if test="mobileNum != null  and mobileNum != ''"> and mobile_num = #{mobileNum}</if>
+            <if test="workId != null  and workId != ''"> and work_id = #{workId}</if>
+        </where>
     </select>
 
     <select id="getWorkerListByWorkId" parameterType="Object" resultMap="SiteWorkerVoResult">
@@ -79,6 +81,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectSiteWorkerVo"/>
         where id = #{id}
     </select>
+    
+    <select id="verifyDeviceIfRunning" parameterType="Object" resultType="int">
+        SELECT
+        count(*)
+        FROM
+        site_worker
+        WHERE
+        work_id in(
+        SELECT
+         work_id
+         FROM
+         site_work
+         WHERE
+         work_status = 1
+        )
+        AND
+        item_code = #{itemCode}
+    </select>
         
     <insert id="insertSiteWorker" parameterType="SiteWorker" useGeneratedKeys="true" keyProperty="id">
         insert into site_worker
@@ -90,6 +110,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="itemCode != null  and itemCode != ''">item_code,</if>
             <if test="itemName != null  and itemName != ''">item_name,</if>
             <if test="orderNum != null ">order_num,</if>
+            <if test="spareWord1 != null  and spareWord1 != ''">spare_word1,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="personName != null  and personName != ''">#{personName},</if>
@@ -99,6 +120,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="itemCode != null  and itemCode != ''">#{itemCode},</if>
             <if test="itemName != null  and itemName != ''">#{itemName},</if>
             <if test="orderNum != null ">#{orderNum},</if>
+            <if test="spareWord1 != null  and spareWord1 != ''">#{spareWord1},</if>
          </trim>
     </insert>
 

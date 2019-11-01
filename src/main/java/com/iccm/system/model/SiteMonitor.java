@@ -49,6 +49,11 @@ public class SiteMonitor extends BaseEntity
      */
     private String remark;
 
+    /**
+     * 端口号
+     */
+    private String spareWord1;
+
     public SiteMonitor(String workId) {
         this.workId = workId;
     }

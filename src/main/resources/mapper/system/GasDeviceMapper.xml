@@ -27,6 +27,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="spareWord1"    column="spare_word1"    />
     </resultMap>
 
+    <select id="getRunningItemId" parameterType="Object" resultType="String">
+        SELECT
+            distinct
+            item_code
+        FROM
+            site_gas
+        WHERE
+            work_id IN (
+                SELECT
+                    work_id
+                FROM
+                    site_work
+                WHERE
+                    work_status = 1
+            )
+    </select>
+
     <select id="getSelectList" parameterType="Object" resultMap="siteGasDeviceResult">
         select id, item_code, item_name, purpose,spare_word1 from gas_device
         <where>

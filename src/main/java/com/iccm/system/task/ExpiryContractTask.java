@@ -46,7 +46,7 @@ public class ExpiryContractTask {
     @Autowired
     private UserMessageMapper userMessageMapper;
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 15 10 ? * *")
     public void expiryContract(){
         List<Contract> list = contractMapper.selectExpiryContract();
         Map<String,String> map = new HashMap();

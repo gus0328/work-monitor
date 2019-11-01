@@ -39,6 +39,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectSiteGasVo"/>
         where work_id = #{workId}
     </select>
+
+    <select id="verifyDeviceIfRunning" parameterType="Object" resultType="int">
+        SELECT
+        count(*)
+        FROM
+        site_gas
+        WHERE
+        work_id in(
+        SELECT
+         work_id
+         FROM
+         site_work
+         WHERE
+         work_status = 1
+        )
+        AND
+        item_code = #{itemCode}
+    </select>
         
     <insert id="insertSiteGas" parameterType="SiteGas" useGeneratedKeys="true" keyProperty="id">
         insert into site_gas

@@ -66,4 +66,10 @@ public interface GasDeviceMapper
      * @return
      */
     public List<SiteGas> getSelectList(GasDevice gasDevice);
+
+    /**
+     * 获取正在作业设备id
+     * @return
+     */
+    public List<String> getRunningItemId();
 }

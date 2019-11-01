@@ -36,7 +36,7 @@ public interface ISiteWorkService
      * @param siteWorkVo 现场作业
      * @return 结果
      */
-    public int insertSiteWork(SiteWorkVo siteWorkVo);
+    public void insertSiteWork(SiteWorkVo siteWorkVo);
 
     /**
      * 修改现场作业
@@ -44,7 +44,7 @@ public interface ISiteWorkService
      * @param siteWorkVo 现场作业
      * @return 结果
      */
-    public int updateSiteWork(SiteWorkVo siteWorkVo);
+    public void updateSiteWork(SiteWorkVo siteWorkVo);
 
     /**
      * 批量删除现场作业
