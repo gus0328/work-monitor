@@ -1,24 +1,22 @@
 package com.iccm.system.service.impl;
 
-import java.util.Date;
-import java.util.List;
-
-import com.alibaba.fastjson.JSONObject;
 import com.iccm.common.*;
 import com.iccm.common.utils.DateUtil;
-import com.iccm.common.utils.UUIDUtil;
 import com.iccm.system.ffmpeg.FfmpegTask;
 import com.iccm.system.mapper.*;
 import com.iccm.system.model.*;
 import com.iccm.system.opcServer.OpcTask;
 import com.iccm.system.opcServer.OpcTypeEnum;
+import com.iccm.system.service.ISiteWorkService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
-import com.iccm.system.service.ISiteWorkService;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * 现场作业Service业务层处理
@@ -55,9 +53,6 @@ public class SiteWorkServiceImpl implements ISiteWorkService
 
     @Autowired
     private OpcTask opcTask;
-
-    @Autowired
-    private FfmpegTask ffmpegTask;
 
     private static final String WORKID ="workId";
 
@@ -244,9 +239,9 @@ public class SiteWorkServiceImpl implements ISiteWorkService
             if(siteWork.getWorkStatus()==1){
                 MonitorDevice monitorDevice = new MonitorDevice();
                 BeanUtils.copyProperties(siteMonitor,monitorDevice);
-                ffmpegTask.addTask(monitorDevice);
+//                ffmpegTask.addTask(monitorDevice);
             }else if(siteWork.getWorkStatus()==2||siteWork.getWorkStatus()==3){
-                ffmpegTask.stopTask(siteMonitor.getIpAdress());
+//                ffmpegTask.stopTask(siteMonitor.getIpAdress());
             }
             siteMonitorMapper.insertSiteMonitor(siteMonitor);
             siteMonitorIndex++;

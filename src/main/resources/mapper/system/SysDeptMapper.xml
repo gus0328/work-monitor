@@ -67,7 +67,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 	
 	<select id="checkDeptExistUser" parameterType="Long" resultType="int">
-		select count(1) from sys_user where dept_id = #{deptId} and state = '0'
+		select count(1) from sys_user where dept_id = #{deptId} and status = '0' AND del_flag = '0'
 	</select>
 	
 	<select id="selectDeptCount" parameterType="SysDept" resultType="int">

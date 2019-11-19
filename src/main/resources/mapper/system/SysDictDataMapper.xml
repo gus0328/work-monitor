@@ -19,6 +19,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="updateBy"   column="update_by"   />
 		<result property="updateTime" column="update_time" />
 	</resultMap>
+
+	<resultMap id="dictData" type="DictData">
+		<result property="label"  column="dict_label"  />
+		<result property="value"  column="dict_value"  />
+	</resultMap>
 	
 	<sql id="selectDictDataVo">
         select dict_code, dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, status, create_by, create_time, remark 
@@ -44,7 +49,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<include refid="selectDictDataVo"/>
 		where status = '0' and dict_type = #{dictType} order by dict_sort asc
 	</select>
-	
+
+	<select id="selectDataByType" parameterType="String" resultMap="dictData">
+		SELECT dict_label,dict_value FROM sys_dict_data WHERE status = '0' and dict_type = #{dictType} order by dict_sort asc
+	</select>
+
 	<select id="selectDictLabel" resultType="String">
 		select dict_label from sys_dict_data
 		where dict_type = #{dictType} and dict_value = #{dictValue}

@@ -43,6 +43,7 @@ public class MyExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.OK)
     public JsonResult exceptionHandle(Exception ex){
+        ex.printStackTrace();
         return JsonResult.error(500,"系统内部发生异常");
     }
 }

@@ -1,5 +1,6 @@
 package com.iccm.system.mapper;
 
+import com.iccm.system.model.DictData;
 import com.iccm.system.model.SysDictData;
 import org.apache.ibatis.annotations.Param;
 
@@ -93,4 +94,12 @@ public interface SysDictDataMapper
      * @return 结果
      */
     public int updateDictDataType(@Param("oldDictType") String oldDictType, @Param("newDictType") String newDictType);
+
+    /**
+     * 根据字典类型查询字典数据
+     * @param type
+     * @return
+     */
+    public List<DictData> selectDataByType(String type);
+
 }

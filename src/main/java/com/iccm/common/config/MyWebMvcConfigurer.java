@@ -53,7 +53,7 @@ public class MyWebMvcConfigurer implements WebMvcConfigurer {
                 excludePathPatterns("/login/*").
                 excludePathPatterns("/captcha/captchaImage").
                 excludePathPatterns("/upload/**").
-                excludePathPatterns("/avator/**").excludePathPatterns("/js/**");
+                excludePathPatterns("/avator/**").excludePathPatterns("/js/**").excludePathPatterns("/save_error_logger");
         registry.addInterceptor(uploadInterceptor).addPathPatterns("/upload/**").excludePathPatterns("/upload/test").excludePathPatterns("/upload/query");
     }
 

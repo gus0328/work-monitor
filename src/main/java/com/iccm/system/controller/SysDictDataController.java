@@ -9,6 +9,7 @@ import com.iccm.common.annotation.PermissionsApi;
 import com.iccm.common.annotation.RequiresPermissions;
 import com.iccm.common.enums.BusinessType;
 import com.iccm.common.page.TableDataInfo;
+import com.iccm.system.mapper.SysDictDataMapper;
 import com.iccm.system.model.PostModel;
 import com.iccm.system.model.SysDictData;
 import com.iccm.system.service.ISysDictDataService;
@@ -34,6 +35,9 @@ public class SysDictDataController extends BaseController
 
     @Autowired
     private ISysDictDataService dictDataService;
+
+    @Autowired
+    private SysDictDataMapper sysDictDataMapper;
 
     /**
      * 查询字典内容
@@ -112,5 +116,15 @@ public class SysDictDataController extends BaseController
     public JsonResult removeById(@RequestBody PostModel postModel){
         dictDataService.deleteDictDataById(Long.parseLong(postModel.getId()));
         return JsonResult.ok();
+    }
+
+    /**
+     * 根据字典类型查询
+     * @param type
+     * @return
+     */
+    @GetMapping("/selectDataByType")
+    public JsonResult selectDataByType(String type){
+        return JsonResult.ok().put("data",sysDictDataMapper.selectDataByType(type));
     }
 }

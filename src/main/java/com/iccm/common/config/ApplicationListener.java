@@ -54,10 +54,10 @@ public class ApplicationListener implements ServletContextListener {
             Application = servletContextEvent.getServletContext();
             executorService = Executors.newFixedThreadPool(20);
             log.warn("- - - - - - - - 已初始化ServletContext- - - - - - - - - - ");
-            List<MonitorDevice> runningDevice = monitorDeviceMapper.getRunningDevice();
-            runningDevice.forEach(monitorDevice -> {
-                ffmpegTask.addTask(monitorDevice);
-            });
+//            List<MonitorDevice> runningDevice = monitorDeviceMapper.getRunningDevice();
+//            runningDevice.forEach(monitorDevice -> {
+//                ffmpegTask.addTask(monitorDevice);
+//            });
             List<String> wearDeviceItemId = wearDeviceMapper.getRunningItemId();
             wearDeviceItemId.forEach(itemId ->{
                 opcTask.addNewItem(itemId);

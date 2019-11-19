@@ -133,14 +133,14 @@ public class SysUserController extends BaseController
         {
             return JsonResult.error("新增用户'" + user.getLoginName() + "'失败，登录账号已存在");
         }
-        else if (UserConstants.USER_PHONE_NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
-        {
-            return JsonResult.error("新增用户'" + user.getLoginName() + "'失败，手机号码已存在");
-        }
-        else if (UserConstants.USER_EMAIL_NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
-        {
-            return JsonResult.error("新增用户'" + user.getLoginName() + "'失败，邮箱账号已存在");
-        }
+//        else if (UserConstants.USER_PHONE_NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
+//        {
+//            return JsonResult.error("新增用户'" + user.getLoginName() + "'失败，手机号码已存在");
+//        }
+//        else if (UserConstants.USER_EMAIL_NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
+//        {
+//            return JsonResult.error("新增用户'" + user.getLoginName() + "'失败，邮箱账号已存在");
+//        }
         user.setPassword(Md5Utils.hash(user.getPassword()));
         user.setCreateBy(SysUtils.getSysUser().getUserName());
         userService.insertUser(user);
@@ -154,14 +154,14 @@ public class SysUserController extends BaseController
     @PostMapping("/edit")
     public JsonResult editSave(@Validated @RequestBody SysUser user)
     {
-        if (UserConstants.USER_PHONE_NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
-        {
-            return JsonResult.error("修改用户'" + user.getLoginName() + "'失败，手机号码已存在");
-        }
-        else if (UserConstants.USER_EMAIL_NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
-        {
-            return JsonResult.error("修改用户'" + user.getLoginName() + "'失败，邮箱账号已存在");
-        }
+//        if (UserConstants.USER_PHONE_NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
+//        {
+//            return JsonResult.error("修改用户'" + user.getLoginName() + "'失败，手机号码已存在");
+//        }
+//        else if (UserConstants.USER_EMAIL_NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
+//        {
+//            return JsonResult.error("修改用户'" + user.getLoginName() + "'失败，邮箱账号已存在");
+//        }
         if(StringUtils.isNotBlank(user.getPassword())&&user.getPassword().length()<30){
             user.setPassword(Md5Utils.hash(user.getPassword()));
         }
@@ -218,18 +218,18 @@ public class SysUserController extends BaseController
      * 校验用户名
      */
     @PostMapping("/checkLoginNameUnique")
-    public String checkLoginNameUnique(@RequestBody SysUser user)
+    public JsonResult checkLoginNameUnique(@RequestBody SysUser user)
     {
-        return userService.checkLoginNameUnique(user.getLoginName());
+        return JsonResult.ok().put("data",userService.checkLoginNameUnique(user.getLoginName()));
     }
 
     /**
      * 校验手机号码
      */
     @PostMapping("/checkPhoneUnique")
-    public String checkPhoneUnique(@RequestBody SysUser user)
+    public JsonResult checkPhoneUnique(@RequestBody SysUser user)
     {
-        return userService.checkPhoneUnique(user);
+        return JsonResult.ok().put("data",userService.checkPhoneUnique(user));
     }
 
     /**
