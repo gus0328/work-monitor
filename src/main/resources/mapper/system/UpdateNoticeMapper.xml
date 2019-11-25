@@ -19,7 +19,7 @@
     </resultMap>
 
     <sql id="selectUpdateNoticeVo">
-        select id, version_code, download_addr, create_by, create_time, update_by, update_time, client_name, sort_num, desc, force_update from update_notice
+        select id, version_code, download_addr, create_by, create_time, update_by, update_time, client_name, sort_num, `desc`, force_update from update_notice
     </sql>
 
     <select id="selectUpdateNoticeList" parameterType="UpdateNotice" resultMap="UpdateNoticeResult">
@@ -29,7 +29,7 @@
             <if test="downloadAddr != null  and downloadAddr != ''"> and download_addr = #{downloadAddr}</if>
             <if test="clientName != null  and clientName != ''"> and client_name like concat('%', #{clientName}, '%')</if>
             <if test="sortNum != null "> and sort_num = #{sortNum}</if>
-            <if test="desc != null  and desc != ''"> and desc = #{desc}</if>
+            <if test="desc != null  and desc != ''"> and `desc` = #{desc}</if>
             <if test="forceUpdate != null "> and force_update = #{forceUpdate}</if>
         </where>
     </select>
@@ -50,7 +50,7 @@
             <if test="updateTime != null ">update_time,</if>
             <if test="clientName != null  and clientName != ''">client_name,</if>
             <if test="sortNum != null ">sort_num,</if>
-            <if test="desc != null  and desc != ''">desc,</if>
+            <if test="desc != null  and desc != ''">`desc`,</if>
             <if test="forceUpdate != null ">force_update,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -78,7 +78,7 @@
             <if test="updateTime != null ">update_time = #{updateTime},</if>
             <if test="clientName != null  and clientName != ''">client_name = #{clientName},</if>
             <if test="sortNum != null ">sort_num = #{sortNum},</if>
-            <if test="desc != null  and desc != ''">desc = #{desc},</if>
+            <if test="desc != null  and desc != ''">`desc` = #{desc},</if>
             <if test="forceUpdate != null ">force_update = #{forceUpdate},</if>
         </trim>
         where id = #{id}

@@ -54,6 +54,9 @@ public class SiteWorkServiceImpl implements ISiteWorkService
     @Autowired
     private OpcTask opcTask;
 
+    @Autowired
+    private GasAlertMapper gasAlertMapper;
+
     private static final String WORKID ="workId";
 
     /**
@@ -194,6 +197,9 @@ public class SiteWorkServiceImpl implements ISiteWorkService
         });
         List<SiteMonitor> monitors = siteMonitorMapper.getMonitorsByWorkId(id);
         List<SiteGas> gases = siteGasMapper.getGasesByWorkId(id);
+        gases.forEach(siteGas -> {
+            siteGas.setGasAlert(gasAlertMapper.selectByGasType(siteGas.getSpareWord1()));
+        });
         siteWorkVo.setWorkers(workers);
         siteWorkVo.setGases(gases);
         siteWorkVo.setMonitors(monitors);

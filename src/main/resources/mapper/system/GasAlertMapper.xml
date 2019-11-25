@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iccm.system.mapper.GasAlertMapper">
+
+    <resultMap type="GasAlert" id="GasAlertResult">
+        <result property="id"    column="id"    />
+        <result property="gasType"    column="gas_type"    />
+        <result property="thanNumber"    column="than_number"    />
+        <result property="lessNumber"    column="less_number"    />
+    </resultMap>
+
+    <sql id="selectGasAlertVo">
+        select id, gas_type, than_number, less_number from gas_alert
+    </sql>
+
+    <select id="selectGasAlertList" parameterType="GasAlert" resultMap="GasAlertResult">
+        <include refid="selectGasAlertVo"/>
+        <where>
+            <if test="gasType != null  and gasType != ''"> and gas_type = #{gasType}</if>
+            <if test="thanNumber != null  and thanNumber != ''"> and than_number = #{thanNumber}</if>
+            <if test="lessNumber != null  and lessNumber != ''"> and less_number = #{lessNumber}</if>
+        </where>
+    </select>
+
+    <select id="selectByGasType" parameterType="String" resultMap="GasAlertResult">
+        <include refid="selectGasAlertVo"/>
+        WHERE gas_type = #{gasType}
+    </select>
+
+    <select id="selectGasAlertById" parameterType="Long" resultMap="GasAlertResult">
+        <include refid="selectGasAlertVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertGasAlert" parameterType="GasAlert" useGeneratedKeys="true" keyProperty="id">
+        insert into gas_alert
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="gasType != null  and gasType != ''">gas_type,</if>
+            <if test="thanNumber != null  and thanNumber != ''">than_number,</if>
+            <if test="lessNumber != null  and lessNumber != ''">less_number,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="gasType != null  and gasType != ''">#{gasType},</if>
+            <if test="thanNumber != null  and thanNumber != ''">#{thanNumber},</if>
+            <if test="lessNumber != null  and lessNumber != ''">#{lessNumber},</if>
+        </trim>
+    </insert>
+
+    <update id="updateGasAlert" parameterType="GasAlert">
+        update gas_alert
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="gasType != null  and gasType != ''">gas_type = #{gasType},</if>
+            <if test="thanNumber != null  and thanNumber != ''">than_number = #{thanNumber},</if>
+            <if test="lessNumber != null  and lessNumber != ''">less_number = #{lessNumber},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGasAlertById" parameterType="Long">
+        delete from gas_alert where id = #{id}
+    </delete>
+
+    <delete id="deleteGasAlertByIds" parameterType="String">
+        delete from gas_alert where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,14 +1,13 @@
 package com.iccm.system.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.iccm.common.BaseController;
-import com.iccm.common.ExcelUtil;
-import com.iccm.common.JsonResult;
-import com.iccm.common.SysUtils;
+import com.iccm.common.*;
 import com.iccm.common.annotation.Log;
 import com.iccm.common.annotation.PermissionsApi;
 import com.iccm.common.annotation.RequiresPermissions;
+import com.iccm.common.config.ApplicationListener;
 import com.iccm.common.enums.BusinessType;
+import com.iccm.common.utils.DateUtil;
 import com.iccm.system.mapper.SiteWorkMapper;
 import com.iccm.system.model.*;
 import com.iccm.system.opcServer.OpcTask;
@@ -16,7 +15,12 @@ import com.iccm.system.service.ISiteWorkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 现场作业Controller
@@ -217,20 +221,25 @@ public class SiteWorkController extends BaseController {
      * @return
      */
     @PostMapping("/getWorkData")
-    public JsonResult getWorkData(@RequestBody WorkData workData){
-        WorkData.RemoteData remoteData = workData.getRemoteData();
-        remoteData.setDevice1(opcTask.get(remoteData.getDevice1(),String.class));
-        remoteData.setDevice2(opcTask.get(remoteData.getDevice2(),String.class));
-        remoteData.setDevice3(opcTask.get(remoteData.getDevice3(),String.class));
-        remoteData.setDevice4(opcTask.get(remoteData.getDevice4(),String.class));
-        remoteData.setDevice5(opcTask.get(remoteData.getDevice5(),String.class));
-        List<WorkData.Person> persons = workData.getPersons();
-        persons.forEach(person -> {
-            String bloodPress = opcTask.get(person.getHeightPress(),String.class)+"/"+ opcTask.get(person.getLowPress(),String.class)+"mmHg";
-            person.setBloodPress(bloodPress);
-            person.setHeartRate(opcTask.get(person.getHeartRate(),String.class)+"次/分钟");
-            person.setSkinT(opcTask.get(person.getSkinT(),String.class)+"℃");
-        });
-        return JsonResult.ok().put("data",workData);
+    public JsonResult getWorkData(@RequestBody WorkData workData) throws ExecutionException, InterruptedException {
+        WorkData workData1 = ApplicationListener.executorService.submit(()->{
+            WorkData.RemoteData remoteData = workData.getRemoteData();
+            remoteData.setDevice1(opcTask.get(remoteData.getDevice1(),String.class));
+            remoteData.setDevice2(opcTask.get(remoteData.getDevice2(),String.class));
+            remoteData.setDevice3(opcTask.get(remoteData.getDevice3(),String.class));
+            remoteData.setDevice4(opcTask.get(remoteData.getDevice4(),String.class));
+            remoteData.setDevice5(opcTask.get(remoteData.getDevice5(),String.class));
+            List<WorkData.Person> persons = workData.getPersons();
+            persons.forEach(person -> {
+                String bloodPress = Double.valueOf(opcTask.get(person.getHeightPress(),String.class)).intValue()+"/"+  Double.valueOf(opcTask.get(person.getLowPress(),String.class)).intValue()+"mmHg";
+                person.setBloodPress(bloodPress);
+                person.setHeartRate(Double.valueOf(opcTask.get(person.getHeartRate(),String.class)).intValue()+"次/分钟");
+                double sk = Double.parseDouble(opcTask.get(person.getSkinT(),String.class));
+                DecimalFormat df = new DecimalFormat(".0");
+                person.setSkinT(df.format(sk)+"℃");
+            });
+            return workData;
+        }).get();
+        return JsonResult.ok().put("data",workData1);
     }
 }

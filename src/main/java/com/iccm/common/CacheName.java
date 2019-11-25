@@ -29,4 +29,9 @@ public class CacheName {
      * opc 数据
      */
     public static final String OPCDATA = "opcData";
+
+    /**
+     * hk 控制
+     */
+    public static final String HKCONTROL = "hkControl";
 }

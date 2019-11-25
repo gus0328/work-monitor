@@ -50,6 +50,8 @@ public class SiteGas extends BaseEntity
      */
     private String spareWord1;
 
+    private GasAlert gasAlert;
+
     public SiteGas(String workId) {
         this.workId = workId;
     }

@@ -7,6 +7,7 @@ import org.openscada.opc.lib.common.ConnectionInformation;
 import org.openscada.opc.lib.da.AccessBase;
 import org.openscada.opc.lib.da.Server;
 
+import java.text.DecimalFormat;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +27,7 @@ public class Test {
         ci.setPassword("Huawei12#$%^");
 //        ci.setProgId("TLSvrRDK.OPCTOOLKIT.DEMO");
         ci.setClsid("FFCED1F1-278E-11D5-A2B0-00C04F1BFD1B"); // if ProgId is not working, try it using the Clsid instead
-        final String itemId = "SIM.HAND.H3";
+        final String itemId = "1190GI1102.DACA.PV";
         final String itemId1 = "4000AI1100_1.DACA.PV";
         // create a new server
         ScheduledExecutorService scheduledExecutorService =Executors.newSingleThreadScheduledExecutor();

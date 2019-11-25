@@ -16,7 +16,6 @@
 package com.iccm.system.hkcontrolls.lib;
 
 
-import com.sun.javafx.font.directwrite.RECT;
 import com.sun.jna.*;
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinNT;
