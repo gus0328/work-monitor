@@ -228,7 +228,14 @@ public class ContractServiceImpl implements IContractService
                     .getJavaDate(Double.valueOf(d+""));
             dateStr = format.format(date);
         }catch (Exception e){
-            //do not;
+            if(dateStr.indexOf("年")!=-1){
+                dateStr = dateStr.replace("年","-");
+                dateStr = dateStr.replace("月","-");
+                dateStr = dateStr.replace("日","");
+            }
+            if(dateStr.indexOf("/")!=-1){
+                dateStr = dateStr.replaceAll("/","-");
+            }
         }
         return dateStr;
     }
