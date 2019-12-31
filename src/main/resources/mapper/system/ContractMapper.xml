@@ -1,78 +1,157 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iccm.system.mapper.ContractMapper">
-    
+
     <resultMap type="Contract" id="ContractResult">
         <result property="id"    column="id"    />
         <result property="contractNo"    column="contract_no"    />
-        <result property="contractDate"    column="contract_date"    />
+        <result property="contractName"    column="contract_name"    />
+        <result property="provideGoods"    column="provide_goods"    />
+        <result property="contractGoodsArrivalDate"    column="contract_goods_arrival_date"    />
+        <result property="contractStopDate"    column="contract_stop_date"    />
+        <result property="contractStatus"    column="contract_status"    />
+        <result property="totalAccount"    column="total_account"    />
+        <result property="totalPay"    column="total_pay"    />
+        <result property="payWarnBfb"    column="pay_warn_bfb"    />
+        <result property="noPay"    column="no_pay"    />
+        <result property="premium"    column="premium"    />
+        <result property="filingDate"    column="filing_date"    />
         <result property="expiryDate"    column="expiry_date"    />
         <result property="warnName"    column="warn_name"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="status"    column="status"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="latestWarnTime"    column="latest_warn_time"    />
+        <result property="warnTime"    column="warn_time"    />
+        <result property="beforeWarnTime"    column="before_warn_time"    />
     </resultMap>
 
     <sql id="selectContractVo">
-        select id, contract_no, contract_date, expiry_date, warn_name, create_by, create_time, status from contract
+        select id, contract_no, contract_name, provide_goods, contract_goods_arrival_date, contract_stop_date, contract_status, total_account, total_pay, pay_warn_bfb, no_pay, premium, filing_date, expiry_date, warn_name, create_by, create_time, status, update_by, update_time, latest_warn_time, warn_time, before_warn_time from contract
     </sql>
-
-    <select id="selectContractList" parameterType="Contract" resultMap="ContractResult">
-        <include refid="selectContractVo"/>
-        <where>  
-            <if test="contractNo != null  and contractNo != ''"> and contract_no = #{contractNo}</if>
-            <if test="contractDate != null  and contractDate != ''"> and contract_date = #{contractDate}</if>
-            <if test="expiryDate != null  and expiryDate != ''"> and expiry_date = #{expiryDate}</if>
-            <if test="warnName != null  and warnName != ''"> and warn_name like concat('%', #{warnName}, '%')</if>
-            <if test="status != null "> and status = #{status}</if>
-        </where>
-    </select>
-    
-    <select id="selectContractById" parameterType="Integer" resultMap="ContractResult">
-        <include refid="selectContractVo"/>
-        where id = #{id}
-    </select>
 
     <select id="selectExpiryContract" parameterType="Object" resultMap="ContractResult">
         <include refid="selectContractVo"/>
         where date_format(sysdate(),'%y%m%d%T') &gt;= date_format(expiry_date,'%y%m%d%T')
         and status = 0
     </select>
-        
+
+    <select id="selectByContractNo" parameterType="String" resultMap="ContractResult">
+        <include refid="selectContractVo"/>
+        WHERE contract_no = #{contractNo}
+    </select>
+
+    <select id="selectContractList" parameterType="Contract" resultMap="ContractResult">
+        <include refid="selectContractVo"/>
+        <where>
+            <if test="contractNo != null  and contractNo != ''"> and contract_no like concat('%', #{contractNo}, '%')</if>
+            <if test="contractName != null  and contractName != ''"> and contract_name like concat('%', #{contractName}, '%')</if>
+            <if test="provideGoods != null  and provideGoods != ''"> and provide_goods LIKE concat('%', #{provideGoods}, '%')</if>
+            <if test="contractGoodsArrivalDate != null  and contractGoodsArrivalDate != ''"> and contract_goods_arrival_date = #{contractGoodsArrivalDate}</if>
+            <if test="contractStopDate != null  and contractStopDate != ''"> and contract_stop_date = #{contractStopDate}</if>
+            <if test="contractStatus != null  and contractStatus != ''"> and contract_status = #{contractStatus}</if>
+            <if test="totalAccount != null  and totalAccount != ''"> and total_account = #{totalAccount}</if>
+            <if test="totalPay != null  and totalPay != ''"> and total_pay = #{totalPay}</if>
+            <if test="payWarnBfb != null  and payWarnBfb != ''"> and pay_warn_bfb = #{payWarnBfb}</if>
+            <if test="noPay != null  and noPay != ''"> and no_pay = #{noPay}</if>
+            <if test="premium != null  and premium != ''"> and premium = #{premium}</if>
+            <if test="filingDate != null  and filingDate != ''"> and filing_date = #{filingDate}</if>
+            <if test="expiryDate != null  and expiryDate != ''"> and expiry_date = #{expiryDate}</if>
+            <if test="warnName != null  and warnName != ''"> and warn_name like concat('%', #{warnName}, '%')</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="latestWarnTime != null "> and latest_warn_time = #{latestWarnTime}</if>
+            <if test="warnTime != null  and warnTime != ''"> and warn_time = #{warnTime}</if>
+            <if test="beforeWarnTime != null  and beforeWarnTime != ''"> and before_warn_time = #{beforeWarnTime}</if>
+            <if test="createBy != null  and createBy != ''"> and create_by = #{createBy}</if>
+        </where>
+    </select>
+
+    <select id="selectContractById" parameterType="Integer" resultMap="ContractResult">
+        <include refid="selectContractVo"/>
+        where id = #{id}
+    </select>
+
     <insert id="insertContract" parameterType="Contract" useGeneratedKeys="true" keyProperty="id">
         insert into contract
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="contractNo != null  and contractNo != ''">contract_no,</if>
-            <if test="contractDate != null  and contractDate != ''">contract_date,</if>
+            <if test="contractName != null  and contractName != ''">contract_name,</if>
+            <if test="provideGoods != null  and provideGoods != ''">provide_goods,</if>
+            <if test="contractGoodsArrivalDate != null  and contractGoodsArrivalDate != ''">contract_goods_arrival_date,</if>
+            <if test="contractStopDate != null  and contractStopDate != ''">contract_stop_date,</if>
+            <if test="contractStatus != null  and contractStatus != ''">contract_status,</if>
+            <if test="totalAccount != null  and totalAccount != ''">total_account,</if>
+            <if test="totalPay != null  and totalPay != ''">total_pay,</if>
+            <if test="payWarnBfb != null  and payWarnBfb != ''">pay_warn_bfb,</if>
+            <if test="noPay != null  and noPay != ''">no_pay,</if>
+            <if test="premium != null  and premium != ''">premium,</if>
+            <if test="filingDate != null  and filingDate != ''">filing_date,</if>
             <if test="expiryDate != null  and expiryDate != ''">expiry_date,</if>
             <if test="warnName != null  and warnName != ''">warn_name,</if>
             <if test="createBy != null  and createBy != ''">create_by,</if>
             <if test="createTime != null ">create_time,</if>
             <if test="status != null ">status,</if>
-         </trim>
+            <if test="updateBy != null  and updateBy != ''">update_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="latestWarnTime != null ">latest_warn_time,</if>
+            <if test="warnTime != null  and warnTime != ''">warn_time,</if>
+            <if test="beforeWarnTime != null  and beforeWarnTime != ''">before_warn_time,</if>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="contractNo != null  and contractNo != ''">#{contractNo},</if>
-            <if test="contractDate != null  and contractDate != ''">#{contractDate},</if>
+            <if test="contractName != null  and contractName != ''">#{contractName},</if>
+            <if test="provideGoods != null  and provideGoods != ''">#{provideGoods},</if>
+            <if test="contractGoodsArrivalDate != null  and contractGoodsArrivalDate != ''">#{contractGoodsArrivalDate},</if>
+            <if test="contractStopDate != null  and contractStopDate != ''">#{contractStopDate},</if>
+            <if test="contractStatus != null  and contractStatus != ''">#{contractStatus},</if>
+            <if test="totalAccount != null  and totalAccount != ''">#{totalAccount},</if>
+            <if test="totalPay != null  and totalPay != ''">#{totalPay},</if>
+            <if test="payWarnBfb != null  and payWarnBfb != ''">#{payWarnBfb},</if>
+            <if test="noPay != null  and noPay != ''">#{noPay},</if>
+            <if test="premium != null  and premium != ''">#{premium},</if>
+            <if test="filingDate != null  and filingDate != ''">#{filingDate},</if>
             <if test="expiryDate != null  and expiryDate != ''">#{expiryDate},</if>
             <if test="warnName != null  and warnName != ''">#{warnName},</if>
             <if test="createBy != null  and createBy != ''">#{createBy},</if>
             <if test="createTime != null ">#{createTime},</if>
             <if test="status != null ">#{status},</if>
-         </trim>
+            <if test="updateBy != null  and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="latestWarnTime != null ">#{latestWarnTime},</if>
+            <if test="warnTime != null  and warnTime != ''">#{warnTime},</if>
+            <if test="beforeWarnTime != null  and beforeWarnTime != ''">#{beforeWarnTime},</if>
+        </trim>
     </insert>
 
     <update id="updateContract" parameterType="Contract">
         update contract
         <trim prefix="SET" suffixOverrides=",">
             <if test="contractNo != null  and contractNo != ''">contract_no = #{contractNo},</if>
-            <if test="contractDate != null  and contractDate != ''">contract_date = #{contractDate},</if>
+            <if test="contractName != null  and contractName != ''">contract_name = #{contractName},</if>
+            <if test="provideGoods != null  and provideGoods != ''">provide_goods = #{provideGoods},</if>
+            <if test="contractGoodsArrivalDate != null  and contractGoodsArrivalDate != ''">contract_goods_arrival_date = #{contractGoodsArrivalDate},</if>
+            <if test="contractStopDate != null  and contractStopDate != ''">contract_stop_date = #{contractStopDate},</if>
+            <if test="contractStatus != null  and contractStatus != ''">contract_status = #{contractStatus},</if>
+            <if test="totalAccount != null  and totalAccount != ''">total_account = #{totalAccount},</if>
+            <if test="totalPay != null  and totalPay != ''">total_pay = #{totalPay},</if>
+            <if test="payWarnBfb != null  and payWarnBfb != ''">pay_warn_bfb = #{payWarnBfb},</if>
+            <if test="noPay != null  and noPay != ''">no_pay = #{noPay},</if>
+            <if test="premium != null  and premium != ''">premium = #{premium},</if>
+            <if test="filingDate != null  and filingDate != ''">filing_date = #{filingDate},</if>
             <if test="expiryDate != null  and expiryDate != ''">expiry_date = #{expiryDate},</if>
             <if test="warnName != null  and warnName != ''">warn_name = #{warnName},</if>
             <if test="createBy != null  and createBy != ''">create_by = #{createBy},</if>
             <if test="createTime != null ">create_time = #{createTime},</if>
             <if test="status != null ">status = #{status},</if>
+            <if test="updateBy != null  and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="latestWarnTime != null ">latest_warn_time = #{latestWarnTime},</if>
+            <if test="warnTime != null  and warnTime != ''">warn_time = #{warnTime},</if>
+            <if test="beforeWarnTime != null  and beforeWarnTime != ''">before_warn_time = #{beforeWarnTime},</if>
         </trim>
         where id = #{id}
     </update>
@@ -82,10 +161,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteContractByIds" parameterType="String">
-        delete from contract where id in 
+        delete from contract where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
     </delete>
-    
+
 </mapper>

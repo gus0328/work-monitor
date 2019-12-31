@@ -104,7 +104,7 @@ public class SysUserController extends BaseController
     public JsonResult importData(MultipartFile file, boolean updateSupport) throws Exception
     {
         ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
-        List<SysUser> userList = util.importExcel(file.getInputStream());
+        List<SysUser> userList = util.importExcel(file.getInputStream(),1);
         String operName = SysUtils.getSysUser().getUserName();
         String message = userService.importUser(userList, updateSupport, operName);
         return JsonResult.ok(message);

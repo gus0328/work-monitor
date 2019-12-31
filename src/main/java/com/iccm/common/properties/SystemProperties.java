@@ -41,4 +41,20 @@ public class SystemProperties {
     private int opcMillis;
 
     private String hlsPath;
+
+    private String appId;
+
+    private String appKey;
+
+    private String appSecret;
+
+    private String masterSecret;
+
+    private String getuiHost;
+
+    private String icon;
+
+    private String warnTime;
+
+    private String beforeWarnTime;
 }

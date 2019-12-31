@@ -99,9 +99,9 @@ public class ExcelUtil<T>
      * @param is 输入流
      * @return 转换后集合
      */
-    public List<T> importExcel(InputStream is) throws Exception
+    public List<T> importExcel(InputStream is,int start) throws Exception
     {
-        return importExcel(StringUtils.EMPTY, is);
+        return importExcel(StringUtils.EMPTY, is,start);
     }
 
     /**
@@ -111,7 +111,7 @@ public class ExcelUtil<T>
      * @param is 输入流
      * @return 转换后集合
      */
-    public List<T> importExcel(String sheetName, InputStream is) throws Exception
+    public List<T> importExcel(String sheetName, InputStream is,int start) throws Exception
     {
         this.type = Excel.Type.IMPORT;
         this.wb = WorkbookFactory.create(is);
@@ -141,6 +141,9 @@ public class ExcelUtil<T>
             Map<String, Integer> cellMap = new HashMap<String, Integer>();
             // 获取表头
             Row heard = sheet.getRow(0);
+            if (heard == null) {
+                heard = sheet.createRow(0);
+            }
             for (int i = 0; i < heard.getPhysicalNumberOfCells(); i++)
             {
                 Cell cell = heard.getCell(i);
@@ -170,7 +173,7 @@ public class ExcelUtil<T>
                     fieldsMap.put(column, field);
                 }
             }
-            for (int i = 1; i < rows; i++)
+            for (int i = start; i < rows; i++)
             {
                 // 从第2行开始取数据,默认第一行是表头.
                 Row row = sheet.getRow(i);

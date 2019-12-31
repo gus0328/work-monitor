@@ -64,4 +64,11 @@ public interface ContractMapper
      * @return
      */
     public List<Contract> selectExpiryContract();
+
+    /**
+     * 根据合同编号查询
+     * @param contractNo
+     * @return
+     */
+    public Contract selectByContractNo(String contractNo);
 }

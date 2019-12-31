@@ -58,4 +58,12 @@ public interface IContractService
      * @return 结果
      */
     public int deleteContractById(Integer id);
+
+    /**
+     * 导入数据
+     * @param contracts
+     * @param isUpdateSupport
+     * @return
+     */
+    public String importData(List<Contract> contracts, Boolean isUpdateSupport);
 }

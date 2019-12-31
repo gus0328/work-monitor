@@ -228,7 +228,7 @@ public class SiteWorkController extends BaseController {
             remoteData.setDevice2(opcTask.get(remoteData.getDevice2(),String.class));
             remoteData.setDevice3(opcTask.get(remoteData.getDevice3(),String.class));
             remoteData.setDevice4(opcTask.get(remoteData.getDevice4(),String.class));
-            remoteData.setDevice5(opcTask.get(remoteData.getDevice5(),String.class));
+//            remoteData.setDevice5(opcTask.get(remoteData.getDevice5(),String.class));
             List<WorkData.Person> persons = workData.getPersons();
             persons.forEach(person -> {
                 String bloodPress = Double.valueOf(opcTask.get(person.getHeightPress(),String.class)).intValue()+"/"+  Double.valueOf(opcTask.get(person.getLowPress(),String.class)).intValue()+"mmHg";
