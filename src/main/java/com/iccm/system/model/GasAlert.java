@@ -2,6 +2,7 @@ package com.iccm.system.model;
 
 import com.iccm.common.annotation.Excel;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Created by Administrator on 2019/11/22.
@@ -23,4 +24,14 @@ public class GasAlert {
     @Excel(name = "小于等于")
     private String lessNumber;
 
+    @Override
+    public String toString() {
+        if(StringUtils.isNotBlank(thanNumber)&&StringUtils.isNotBlank(lessNumber)){
+            return lessNumber+"-"+thanNumber;
+        }else if(StringUtils.isNotBlank(thanNumber)){
+           return   "< "+thanNumber;
+        }else{
+            return "> "+lessNumber;
+        }
+    }
 }

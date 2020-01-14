@@ -1,15 +1,13 @@
 package com.iccm.system.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.iccm.common.BaseController;
 import com.iccm.common.JsonResult;
 import com.iccm.system.model.GasAlert;
 import com.iccm.system.model.PostModel;
 import com.iccm.system.service.IGasAlertService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,6 +29,20 @@ public class GasAlertController extends BaseController {
     {
         List<GasAlert> list = gasAlertService.selectGasAlertList(gasAlert);
         return JsonResult.ok().put("data",list);
+    }
+
+    /**
+     * 获取
+     * @return
+     */
+    @GetMapping("/getAlertValue")
+    public JsonResult getAlertValue(){
+        List<GasAlert> list = gasAlertService.selectGasAlertList(new GasAlert());
+        JSONObject jsonObject = new JSONObject();
+        list.forEach(gasAlert -> {
+            jsonObject.put("device"+gasAlert.getGasType(),gasAlert.toString());
+        });
+        return JsonResult.ok().put("data",jsonObject);
     }
 
     @PostMapping("/pageList")
